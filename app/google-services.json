@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "63972000114",
+    "project_id": "buddhatutor-e02ed",
+    "storage_bucket": "buddhatutor-e02ed.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:63972000114:android:683d1119979a167f109deb",
+        "android_client_info": {
+          "package_name": "com.buddhatutors"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA5zsFWNvaujQmlOhJuH8kpn2llJ-IvNjI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
