@@ -21,4 +21,11 @@ dependencyResolutionManagement {
 
 rootProject.name = "Buddha Tutor"
 include(":app")
- 
+include(":domain")
+include(":appadmin")
+include(":data")
+include(":common")
+include(":common:auth")
+include(":student")
+include(":common:navigation")
+include(":common:utils")

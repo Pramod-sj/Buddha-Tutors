@@ -98,4 +98,12 @@ dependencies {
     implementation(libs.moshi.adapters)
     ksp(libs.moshi.kotlin.codegen)
 
+    implementation(project(":common"))
+    implementation(project(":common:auth"))
+    implementation(project(":common:navigation"))
+    implementation(project(":data"))
+    implementation(project(":domain"))
+
+
+    implementation(project(":appadmin"))
 }

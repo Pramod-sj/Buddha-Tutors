@@ -1,0 +1,15 @@
+package com.buddhatutors.domain.model.registration
+
+import com.buddhatutors.domain.model.Topic
+import com.buddhatutors.domain.model.user.User
+import com.buddhatutors.domain.model.user.UserType
+
+internal data class UserRegistrationModel(
+    val name: String,
+    val email: String,
+    val password: String,
+    val userType: UserType,
+    val expertiseIn: List<Topic>? = null,
+    val availabilityDay: List<String>? = null,
+    val timeAvailability: TimeSlot? = null,
+)
