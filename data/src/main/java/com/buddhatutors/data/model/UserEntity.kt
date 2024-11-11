@@ -9,21 +9,74 @@ import com.buddhatutors.domain.model.user.Tutor
 import com.buddhatutors.domain.model.user.User
 import com.buddhatutors.domain.model.user.UserType
 
-data class UserEntity(
-    val id: String = "",
-    val name: String = "",
-    val email: String = "",
-    val expertiseIn: List<Topic> = emptyList(),
-    val availabilityDay: List<String> = emptyList(),
+sealed class UserEntity {
+    abstract val id: String
+    abstract val name: String
+    abstract val email: String
+    abstract val userType: Int
+}
+
+data class StudentE(
+    override val id: String = "",
+    override val name: String = "",
+    override val email: String = "",
+    override val userType: Int = UserType.STUDENT.id
+) : UserEntity()
+
+
+data class TutorE(
+    override val id: String = "",
+    override val name: String = "",
+    override val email: String = "",
+    override val userType: Int = UserType.TUTOR.id,
+    val expertiseIn: List<Topic>? = null,
+    val availabilityDay: List<String>? = null,
     val timeAvailability: TimeSlot? = null,
-    val userType: Int = -1
-)
+) : UserEntity()
 
 
-fun UserEntity.toDomain(): User? {
-    return when (userType) {
+data class AdminE(
+    override val id: String = "",
+    override val name: String = "",
+    override val email: String = "",
+    override val userType: Int = UserType.ADMIN.id,
+) : UserEntity()
 
-        UserType.STUDENT.id -> {
+
+data class MasterTutorE(
+    override val id: String = "",
+    override val name: String = "",
+    override val email: String = "",
+    override val userType: Int = UserType.MASTER_TUTOR.id,
+) : UserEntity()
+
+fun TutorE.toDomain(): Tutor {
+    return Tutor(
+        id = id,
+        name = name,
+        email = email,
+        expertiseIn = expertiseIn,
+        availabilityDay = availabilityDay,
+        timeAvailability = timeAvailability,
+    )
+}
+
+fun Tutor.toEntity(): TutorE {
+    return TutorE(
+        id = id,
+        name = name,
+        email = email,
+        expertiseIn = expertiseIn,
+        availabilityDay = availabilityDay,
+        timeAvailability = timeAvailability,
+    )
+}
+
+
+fun UserEntity.toDomain(): User {
+    return when (this) {
+
+        is StudentE -> {
             Student(
                 id = id,
                 name = name,
@@ -31,7 +84,7 @@ fun UserEntity.toDomain(): User? {
             )
         }
 
-        UserType.TUTOR.id -> {
+        is TutorE -> {
             Tutor(
                 id = id,
                 name = name,
@@ -42,7 +95,7 @@ fun UserEntity.toDomain(): User? {
             )
         }
 
-        UserType.ADMIN.id -> {
+        is AdminE -> {
             Admin(
                 id = id,
                 name = name,
@@ -50,17 +103,13 @@ fun UserEntity.toDomain(): User? {
             )
         }
 
-        UserType.MASTER_TUTOR.id -> {
+        is MasterTutorE -> {
             MasterTutor(
                 id = id,
                 name = name,
                 email = email
             )
         }
-
-
-        else -> null
-
     }
 }
 
@@ -69,7 +118,7 @@ fun User.toEntity(): UserEntity {
     return when (this) {
 
         is Student -> {
-            UserEntity(
+            StudentE(
                 id = id,
                 name = name,
                 email = email,
@@ -78,7 +127,7 @@ fun User.toEntity(): UserEntity {
         }
 
         is Tutor -> {
-            UserEntity(
+            TutorE(
                 id = id,
                 name = name,
                 email = email,
@@ -90,7 +139,7 @@ fun User.toEntity(): UserEntity {
         }
 
         is Admin -> {
-            UserEntity(
+            AdminE(
                 id = id,
                 name = name,
                 email = email,
@@ -99,7 +148,7 @@ fun User.toEntity(): UserEntity {
         }
 
         is MasterTutor -> {
-            UserEntity(
+            MasterTutorE(
                 id = id,
                 name = name,
                 email = email,

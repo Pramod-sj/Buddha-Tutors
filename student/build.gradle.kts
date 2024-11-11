@@ -43,6 +43,7 @@ android {
 
 dependencies {
 
+    implementation(project(":common:navigation"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -57,6 +58,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
 
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    debugImplementation(libs.ui.tooling)
 
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.android)

@@ -1,17 +1,19 @@
 package com.buddhatutors.data.datasourceimpl
 
+import com.buddhatutors.data.model.toDomain
 import com.buddhatutors.data.model.toEntity
 import com.buddhatutors.data.model.tutorlisting.TutorListingE
+import com.buddhatutors.data.model.tutorlisting.VerificationE
 import com.buddhatutors.data.model.tutorlisting.toDomain
 import com.buddhatutors.data.model.tutorlisting.toEntity
 import com.buddhatutors.domain.datasource.TutorListingDataSource
 import com.buddhatutors.domain.model.Resource
-import com.buddhatutors.domain.model.TutorListing
+import com.buddhatutors.domain.model.tutorlisting.TutorListing
+import com.buddhatutors.domain.model.tutorlisting.slotbooking.BookedSlot
 import com.buddhatutors.domain.model.user.Tutor
 import com.buddhatutors.domain.model.user.User
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -72,6 +74,27 @@ class TutorListingDataSourceImpl @Inject constructor(
         }
     }
 
+    override suspend fun getVerifiedTutorListing(): Resource<List<TutorListing>> {
+        return suspendCoroutine { continuation ->
+            tutorsDocumentReference
+                .whereEqualTo("verification.approved", true)
+                .get()
+                .addOnCompleteListener { result ->
+                    if (result.isSuccessful) {
+                        val value = result.result
+                        val tutorListing = if (value?.isEmpty == false) {
+                            value.toObjects(TutorListingE::class.java).mapNotNull { it.toDomain() }
+                        } else emptyList()
+                        continuation.resume(Resource.Success(tutorListing))
+                    } else {
+                        continuation.resume(
+                            Resource.Error(result.exception ?: Exception(""))
+                        )
+                    }
+                }
+        }
+    }
+
     override suspend fun updateTutorVerifiedStatus(
         tutor: Tutor,
         verifiedByUser: User,
@@ -92,7 +115,7 @@ class TutorListingDataSourceImpl @Inject constructor(
 
             val tutorListing = TutorListingE(
                 tutor = tutor.toEntity(),
-                verification = TutorListingE.VerificationE(
+                verification = VerificationE(
                     approved = isApproved,
                     verifiedByUserId = verifiedByUser.id,
                     verifiedByUserName = verifiedByUser.name,
@@ -115,6 +138,57 @@ class TutorListingDataSourceImpl @Inject constructor(
                                 it.exception ?: Throwable("Something went wrong!")
                             )
                         )
+                    }
+                }
+        }
+    }
+
+    override suspend fun bookTutorSlot(tutorId: String, bookedSlot: BookedSlot): Resource<Unit> {
+        if (isSlotAlreadyBooked(tutorId = tutorId, bookedSlot = bookedSlot)) {
+            return Resource.Error(Throwable("Slot already booked!"))
+        }
+        return suspendCoroutine { continuation ->
+            tutorsDocumentReference
+                .document(tutorId)
+                .update("bookedSlots", FieldValue.arrayUnion(bookedSlot.toEntity()))
+                .addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        continuation.resume(Resource.Success(Unit))
+                    } else {
+                        continuation.resume(
+                            Resource.Error(
+                                it.exception ?: Throwable("Something went wrong!")
+                            )
+                        )
+                    }
+                }
+        }
+    }
+
+    private suspend fun isSlotAlreadyBooked(
+        tutorId: String, bookedSlot: BookedSlot
+    ): Boolean {
+        return suspendCoroutine { continuation ->
+            tutorsDocumentReference
+                .document(tutorId)
+                .get()
+                .addOnCompleteListener { result ->
+                    if (result.isSuccessful) {
+
+                        val tutor = result.result.toObject(TutorListingE::class.java)
+
+                        val isSlotAlreadyBooked = tutor?.bookedSlots?.any {
+                            it.date == bookedSlot.date &&
+                                    it.startTime == bookedSlot.startTime &&
+                                    it.endTime == bookedSlot.endTime
+                        } ?: false
+
+                        continuation.resume(isSlotAlreadyBooked)
+
+                    } else {
+
+                        continuation.resume(false)
+
                     }
                 }
         }

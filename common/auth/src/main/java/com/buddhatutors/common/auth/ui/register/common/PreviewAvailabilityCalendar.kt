@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.buddhatutors.domain.model.registration.TimeSlot
 import com.buddhatutors.common.auth.ui.register.DynamicSelectTextField
+import java.util.Locale
 
 @Preview(backgroundColor = 0xFFFFFFFF)
 @Composable
@@ -49,9 +50,18 @@ fun AvailabilityCalendarChooser(
 
     val days = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
-    val times = (8..23).flatMap {
-        listOf("${String.format("%02d", it)}:00", "${String.format("%02d", it)}:30")
-    }
+    val times = (8..23)
+        .flatMap {
+            listOf(
+                "${String.format(Locale.ENGLISH, "%02d", it)}:00",
+                "${String.format(Locale.ENGLISH, "%02d", it)}:30"
+            )
+        }.map { timeString ->
+            val (hour, min) = timeString.split(":").map { it.toInt() }
+            val hour12 = if (hour > 12) hour - 12 else hour
+            val period = if (hour < 12) "AM" else "PM"
+            String.format(Locale.ENGLISH, "%02d:%02d %s", hour12, min, period)
+        }
 
     Column(modifier = Modifier.fillMaxWidth()) {
 

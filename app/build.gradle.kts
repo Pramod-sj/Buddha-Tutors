@@ -70,6 +70,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.navigation.hilt)
     implementation(libs.firebase.config.ktx)
+    implementation(project(":student"))
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

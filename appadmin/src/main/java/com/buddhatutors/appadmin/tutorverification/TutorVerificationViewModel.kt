@@ -10,9 +10,8 @@ import com.buddhatutors.common.auth.SessionManager
 import com.buddhatutors.common.navigation.AdminGraph
 import com.buddhatutors.common.navigation.navigationCustomArgument
 import com.buddhatutors.domain.model.Resource
-import com.buddhatutors.domain.model.TutorListing
+import com.buddhatutors.domain.model.tutorlisting.TutorListing
 import com.buddhatutors.domain.model.user.Tutor
-import com.buddhatutors.domain.model.user.User
 import com.buddhatutors.domain.usecase.admin.GetTutorListingByTutorId
 import com.buddhatutors.domain.usecase.admin.UpdateTutorVerificationState
 import dagger.hilt.android.lifecycle.HiltViewModel

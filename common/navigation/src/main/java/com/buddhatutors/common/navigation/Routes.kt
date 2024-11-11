@@ -1,5 +1,6 @@
 package com.buddhatutors.common.navigation
 
+import com.buddhatutors.domain.model.tutorlisting.TutorListing
 import com.buddhatutors.domain.model.user.Tutor
 import com.buddhatutors.domain.model.user.User
 import kotlinx.serialization.Serializable
@@ -51,7 +52,7 @@ object StudentGraph {
     object Home
 
     @Serializable
-    object TutorDetail
+    data class TutorDetail(val tutorListing: TutorListing)
 
 }
 

@@ -18,10 +18,14 @@ import com.buddhatutors.common.navComposable
 import com.buddhatutors.common.navigation.AdminGraph
 import com.buddhatutors.common.navigation.AuthGraph
 import com.buddhatutors.common.navigation.Splash
+import com.buddhatutors.common.navigation.StudentGraph
 import com.buddhatutors.common.navigation.navigationCustomArgument
 import com.buddhatutors.common.theme.BuddhaTutorTheme
+import com.buddhatutors.domain.model.tutorlisting.TutorListing
 import com.buddhatutors.domain.model.user.Tutor
 import com.buddhatutors.domain.model.user.User
+import com.buddhatutors.student.home.StudentHomeScreen
+import com.buddhatutors.student.tutorslotbooking.TutorDetailScreen
 import com.buddhatutors.ui.splash.SplashScreen
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -71,9 +75,18 @@ class MainActivity : ComponentActivity() {
 
                             navComposable<AdminGraph.AdminTutorVerification>(
                                 typeMap = mapOf(navigationCustomArgument<Tutor>())
-                            ) {
-                                TutorVerificationScreen()
-                            }
+                            ) { TutorVerificationScreen() }
+
+                        }
+
+
+                        navigation<StudentGraph>(startDestination = StudentGraph.Home) {
+
+                            navComposable<StudentGraph.Home> { StudentHomeScreen() }
+
+                            navComposable<StudentGraph.TutorDetail>(
+                                typeMap = mapOf(navigationCustomArgument<TutorListing>())
+                            ) { TutorDetailScreen() }
 
                         }
 
