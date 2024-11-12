@@ -1,5 +1,13 @@
 package com.buddhatutors.data.datasourceimpl
 
+import com.buddhatutors.auth.AuthResultFailure
+import com.buddhatutors.auth.AuthResultSuccess
+import com.buddhatutors.auth.AuthSignupResultFailure
+import com.buddhatutors.auth.AuthSignupResultSuccess
+import com.buddhatutors.domain.AuthLoginRequestPayload
+import com.buddhatutors.domain.AuthSignupRequestPayload
+import com.buddhatutors.domain.LoginHandler
+import com.buddhatutors.domain.SignupHandler
 import com.buddhatutors.domain.datasource.AuthDataSource
 import com.buddhatutors.domain.datasource.UserDataSource
 import com.buddhatutors.domain.model.Resource
@@ -9,97 +17,86 @@ import com.buddhatutors.domain.model.user.Student
 import com.buddhatutors.domain.model.user.Tutor
 import com.buddhatutors.domain.model.user.User
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import javax.inject.Inject
-import kotlin.coroutines.resume
 
 internal class AuthDataSourceImpl @Inject constructor(
-    private val firebaseAuth: FirebaseAuth,
-    private val userDataSource: UserDataSource
+    private val loginHandlers: Map<String, @JvmSuppressWildcards LoginHandler>,
+    private val signupHandlers: Map<String, @JvmSuppressWildcards SignupHandler>,
+    private val userDataSource: UserDataSource,
+    private val userCreationService: UserCreationService
 ) : AuthDataSource {
 
-    override suspend fun register(user: User, pass: String): Resource<User> {
-        return suspendCancellableCoroutine { continuation ->
-            var job: Job? = null
-            firebaseAuth.createUserWithEmailAndPassword(user.email, pass)
-                .addOnCompleteListener { task ->
-                    job = CoroutineScope(continuation.context).launch {
-                        if (task.isSuccessful) {
+    override suspend fun signUp(
+        method: String,
+        authSignupRequestPayload: AuthSignupRequestPayload
+    ): Resource<User> {
+        val handler = signupHandlers[method]
+            ?: throw IllegalArgumentException("Signup method $method not supported")
 
-                            val userWithGuid = when (user) {
-                                is Student -> user.copy(id = task.result.user?.uid.orEmpty())
-                                is Tutor -> user.copy(id = task.result.user?.uid.orEmpty())
-                                is Admin -> user.copy(id = task.result.user?.uid.orEmpty())
-                                is MasterTutor -> user.copy(id = task.result.user?.uid.orEmpty())
-                            }
+        return when (val result = handler.signUp(authSignupRequestPayload)) {
+            is AuthSignupResultSuccess -> {
+                val user = authSignupRequestPayload.user
 
-                            when (val resource =
-                                userDataSource.setUser(userWithGuid)) {
-                                is Resource.Error -> {
-                                    continuation.resume(Resource.Error(resource.throwable))
-                                }
+                val userWithGuid = userCreationService.createUserWithGuid(user, result)
 
-                                is Resource.Success -> {
-                                    continuation.resume(Resource.Success(user))
-                                }
-                            }
-                        } else {
-                            continuation.resume(Resource.Error(task.exception ?: Exception("")))
-                        }
-                    }
+                when (val resource = userDataSource.setUser(userWithGuid)) {
+
+                    is Resource.Error -> Resource.Error(resource.throwable)
+
+                    is Resource.Success -> Resource.Success(user)
                 }
-            continuation.invokeOnCancellation {
-                job?.cancel()
+            }
+
+            is AuthSignupResultFailure -> {
+                Resource.Error(Throwable(result.message))
+            }
+
+            else -> {
+                Resource.Error(Throwable("Signup result is unknown for $method"))
             }
         }
     }
 
-    override suspend fun login(email: String, pass: String): Resource<User> {
-        return suspendCancellableCoroutine { continuation ->
+    override suspend fun signIn(
+        method: String,
+        authLoginRequestPayload: AuthLoginRequestPayload
+    ): Resource<User> {
+        val handler = loginHandlers[method]
+            ?: throw IllegalArgumentException("Login method $method not supported")
 
-            var getUserDataJob: Job? = null
+        return when (val result = handler.signIn(authLoginRequestPayload)) {
+            is AuthResultSuccess -> {
+                userDataSource.getUser(result.uid)
+            }
 
-            firebaseAuth.signInWithEmailAndPassword(email, pass)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val user = task.result?.user
-                        if (user != null) {
-                            getUserDataJob = CoroutineScope(continuation.context).launch {
-                                try {
-                                    val resource = userDataSource.getUser(user.uid)
-                                    continuation.resume(resource)
-                                } catch (e: Exception) {
-                                    continuation.resume(Resource.Error(e))
-                                }
-                            }
-                        } else {
-                            // Handle the case where user is null
-                            continuation.resume(Resource.Error(Exception("User is null")))
-                        }
-                    } else {
-                        // Resume continuation with an error
-                        continuation.resume(
-                            Resource.Error(
-                                task.exception ?: Exception("Unknown error")
-                            )
-                        )
-                    }
-                }
+            is AuthResultFailure -> {
+                Resource.Error(Throwable(result.message))
+            }
 
-            // If coroutine is cancelled, cancel the task
-            continuation.invokeOnCancellation {
-                getUserDataJob?.cancel()
-                firebaseAuth.signOut() // or handle any required cleanup
+            else -> {
+                Resource.Error(Throwable("Login result is unknown for $method"))
             }
         }
+
     }
 
     override suspend fun logout(): Resource<Boolean> {
         FirebaseAuth.getInstance().signOut()
         return Resource.Success(true)
+    }
+
+}
+
+
+class UserCreationService @Inject constructor() {
+
+    fun createUserWithGuid(user: User, result: AuthSignupResultSuccess): User {
+        return when (user) {
+            is Student -> user.copy(id = result.uid)
+            is Tutor -> user.copy(id = result.uid)
+            is Admin -> user.copy(id = result.uid)
+            is MasterTutor -> user.copy(id = result.uid)
+        }
     }
 
 }

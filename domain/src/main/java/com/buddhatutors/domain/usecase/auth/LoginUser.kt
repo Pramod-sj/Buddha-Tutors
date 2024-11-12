@@ -1,5 +1,7 @@
 package com.buddhatutors.domain.usecase.auth
 
+import com.buddhatutors.domain.AuthLoginRequestPayload
+import com.buddhatutors.domain.EMAIL_SIGN_IN_METHOD_NAME
 import com.buddhatutors.domain.UserSessionDataSource
 import com.buddhatutors.domain.datasource.AuthDataSource
 import com.buddhatutors.domain.model.Resource
@@ -20,7 +22,12 @@ class LoginUser @Inject constructor(
         } else if (pass.isEmpty()) {
             Resource.Error(Throwable("Password cannot be empty"))
         } else {
-            val resource = authDataSource.login(email, pass)
+            val resource = authDataSource.signIn(
+                method = EMAIL_SIGN_IN_METHOD_NAME,
+                authLoginRequestPayload = AuthLoginRequestPayload.EmailPasswordLoginRequestPayload(
+                    email = email, password = pass
+                )
+            )
             if (resource is Resource.Success) {
                 userSessionDataSource.saveAuthToken(resource.data)
             }

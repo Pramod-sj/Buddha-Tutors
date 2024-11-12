@@ -24,7 +24,7 @@ internal class UserDataSourceImpl @Inject constructor() : UserDataSource {
 
     private fun DocumentSnapshot.toUserObject(): UserEntity? {
 
-        return when (toObject(UserEntity::class.java)?.userType) {
+        return when (get("userType", Int::class.java)) {
 
             UserType.STUDENT.id -> toObject(StudentE::class.java)
 

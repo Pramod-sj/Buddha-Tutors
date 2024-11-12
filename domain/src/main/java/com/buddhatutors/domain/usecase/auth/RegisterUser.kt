@@ -1,5 +1,7 @@
 package com.buddhatutors.domain.usecase.auth
 
+import com.buddhatutors.domain.AuthSignupRequestPayload
+import com.buddhatutors.domain.EMAIL_SIGN_UP_METHOD_NAME
 import com.buddhatutors.domain.datasource.AuthDataSource
 import com.buddhatutors.domain.model.Resource
 import com.buddhatutors.domain.model.user.User
@@ -17,7 +19,13 @@ class RegisterUser @Inject constructor(
         } else if (pass.isEmpty()) {
             Resource.Error(Throwable("Password cannot be empty"))
         } else {
-            authDataSource.register(model, pass)
+            authDataSource.signUp(
+                method = EMAIL_SIGN_UP_METHOD_NAME,
+                authSignupRequestPayload = AuthSignupRequestPayload.EmailPasswordAuthSignupRequestPayload(
+                    user = model,
+                    password = pass
+                )
+            )
         }
     }
 
