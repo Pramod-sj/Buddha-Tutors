@@ -65,6 +65,6 @@ dependencies {
     implementation(libs.navigation.hilt)
 
     implementation(project(":common"))
-    implementation(project(":common:auth"))
+    implementation(project(":common:auth-ui"))
     implementation(project(":domain"))
 }

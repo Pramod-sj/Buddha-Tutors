@@ -13,7 +13,7 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/appadmin" />
             <option value="$PROJECT_DIR$/common" />
-            <option value="$PROJECT_DIR$/common/auth" />
+            <option value="$PROJECT_DIR$/common/auth-ui" />
             <option value="$PROJECT_DIR$/common/navigation" />
             <option value="$PROJECT_DIR$/common/utils" />
             <option value="$PROJECT_DIR$/data" />

@@ -100,7 +100,7 @@ dependencies {
     ksp(libs.moshi.kotlin.codegen)
 
     implementation(project(":common"))
-    implementation(project(":common:auth"))
+    implementation(project(":common:auth-ui"))
     implementation(project(":common:navigation"))
     implementation(project(":data"))
     implementation(project(":domain"))
