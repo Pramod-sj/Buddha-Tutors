@@ -6,8 +6,7 @@ import com.buddhatutors.common.UiEffect
 import com.buddhatutors.common.UiEvent
 import com.buddhatutors.common.UiState
 import com.buddhatutors.domain.model.Resource
-import com.buddhatutors.domain.model.user.Tutor
-import com.buddhatutors.domain.model.user.User
+import com.buddhatutors.domain.model.tutorlisting.TutorListing
 import com.buddhatutors.domain.usecase.admin.GetAllUnverifiedTutorUsers
 import com.buddhatutors.domain.usecase.auth.LogoutUser
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -64,14 +63,14 @@ internal class AdminHomeViewModel @Inject constructor(
 
 internal data class AdminHomeUiState(
     val exampleData: String = "",
-    val tutorUsers: List<Tutor> = emptyList()
+    val tutorUsers: List<TutorListing> = emptyList()
 ) : UiState
 
 internal sealed class AdminHomeUiEvent : UiEvent {
 
     data object Logout : AdminHomeUiEvent()
 
-    data class TutorCardClick(val tutor: Tutor) : AdminHomeUiEvent()
+    data class TutorCardClick(val tutor: TutorListing) : AdminHomeUiEvent()
 
 }
 
@@ -79,6 +78,6 @@ internal sealed class AdminHomeUiEffect : UiEffect {
 
     data object LoggedOutSuccess : AdminHomeUiEffect()
 
-    data class NavigateToTutorVerificationScreen(val tutor: Tutor) : AdminHomeUiEffect()
+    data class NavigateToTutorVerificationScreen(val tutor: TutorListing) : AdminHomeUiEffect()
 
 }

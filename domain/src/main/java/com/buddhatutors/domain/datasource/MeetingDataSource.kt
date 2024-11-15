@@ -2,9 +2,9 @@ package com.buddhatutors.domain.datasource
 
 import com.buddhatutors.domain.model.Resource
 import com.buddhatutors.domain.model.meet.MeetInfo
+import com.buddhatutors.domain.model.tutorlisting.TutorListing
 import com.buddhatutors.domain.model.tutorlisting.slotbooking.BookedSlot
-import com.buddhatutors.domain.model.user.Student
-import com.buddhatutors.domain.model.user.Tutor
+import com.buddhatutors.domain.model.user.User
 
 /**
  * An interface for scheduling and managing meeting events.
@@ -25,8 +25,8 @@ interface MeetingDataSource {
      */
     suspend fun scheduleMeet(
         accessToken: String,
-        student: Student,
-        tutor: Tutor,
+        student: User,
+        tutor: User,
         bookedSlot: BookedSlot
     ): Resource<MeetInfo>
 

@@ -18,18 +18,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.buddhatutors.domain.model.Topic
-import com.buddhatutors.domain.model.user.Tutor
-import com.buddhatutors.domain.model.user.User
+import com.buddhatutors.domain.model.tutorlisting.TutorListing
 
 @Preview
 @Composable
 fun PreviewTutorItemCard() {
     com.buddhatutors.common.theme.BuddhaTutorTheme {
         TutorItemCard(
-            Tutor(
-                id = "",
-                name = "Pramod Singh",
-                email = "",
+            TutorListing(
                 expertiseIn = listOf(
                     Topic("", "Small bhajans, peotry practice"),
                     Topic("", "Test 2"),
@@ -44,7 +40,7 @@ fun PreviewTutorItemCard() {
 
 @Composable
 fun TutorItemCard(
-    tutor: Tutor,
+    tutor: TutorListing,
     onClick: () -> Unit = {}
 ) {
 
@@ -72,7 +68,7 @@ fun TutorItemCard(
             ) {
 
                 Text(
-                    text = tutor.name,
+                    text = tutor.tutorUser.name,
                     style = MaterialTheme.typography.titleMedium
                 )
 

@@ -3,8 +3,6 @@ package com.buddhatutors.domain.usecase.student
 import com.buddhatutors.domain.datasource.TutorListingDataSource
 import com.buddhatutors.domain.model.Resource
 import com.buddhatutors.domain.model.tutorlisting.TutorListing
-import com.buddhatutors.domain.model.user.Tutor
-import com.buddhatutors.domain.model.user.UserType
 import javax.inject.Inject
 
 class GetAllVerifiedTutorListing @Inject constructor(

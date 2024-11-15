@@ -1,7 +1,6 @@
 package com.buddhatutors.student.tutorslotbooking
 
 import android.app.PendingIntent
-import android.content.IntentSender
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -13,7 +12,6 @@ import com.buddhatutors.common.UiState
 import com.buddhatutors.common.navigation.StudentGraph
 import com.buddhatutors.common.navigation.navigationCustomArgument
 import com.buddhatutors.common.utils.DateUtils
-import com.buddhatutors.data.datasourceimpl.PendingIndentWrapper
 import com.buddhatutors.domain.ContextWrapper
 import com.buddhatutors.domain.CurrentUser
 import com.buddhatutors.domain.GoogleScopeResolutionException
@@ -137,7 +135,7 @@ class TutorDetailViewModel @Inject constructor(
 
     private suspend fun bookSlot() {
         val student = CurrentUser.user.value ?: return
-        val tutor = (currentState.tutorListing?.tutor) ?: return
+        val tutor = (currentState.tutorListing) ?: return
         val resource = bookTutorSlot(
             loggedInUser = student,
             tutor = tutor,
@@ -149,7 +147,7 @@ class TutorDetailViewModel @Inject constructor(
                 bookedAtDateTime = DateUtils.convertTimeInMillisToSpecifiedDateString(
                     timeInMillis = Calendar.getInstance().timeInMillis
                 ),
-                topic = currentState.tutorListing?.tutor?.expertiseIn?.firstOrNull()
+                topic = currentState.tutorListing?.expertiseIn?.firstOrNull()
             )
         )
         when (resource) {
@@ -171,7 +169,7 @@ class TutorDetailViewModel @Inject constructor(
 
     private fun generateDates(tutorListing: TutorListing?): List<SlotDateUiModel> {
 
-        val days = tutorListing?.tutor?.availabilityDay?.map {
+        val days = tutorListing?.availabilityDay?.map {
             when (it.lowercase()) {
                 "mon" -> Calendar.MONDAY
                 "tue" -> Calendar.TUESDAY
@@ -216,15 +214,15 @@ class TutorDetailViewModel @Inject constructor(
 
         val isSlotBooked = tutorListing.bookedSlots.any {
             it.date == dateSlotUiModel.dateString
-                    && it.startTime == tutorListing.tutor?.timeAvailability?.start.orEmpty()
-                    && it.endTime == tutorListing.tutor?.timeAvailability?.end.orEmpty()
+                    && it.startTime == tutorListing?.timeAvailability?.start.orEmpty()
+                    && it.endTime == tutorListing?.timeAvailability?.end.orEmpty()
         }
 
         return listOf(
             SlotTimeUiModel(
                 dateString = dateSlotUiModel.formattedDateString,
-                startTime = tutorListing.tutor?.timeAvailability?.start.orEmpty(),
-                endTime = tutorListing.tutor?.timeAvailability?.end.orEmpty(),
+                startTime = tutorListing?.timeAvailability?.start.orEmpty(),
+                endTime = tutorListing?.timeAvailability?.end.orEmpty(),
                 isSlotBooked = isSlotBooked
             )
         )
@@ -234,7 +232,7 @@ class TutorDetailViewModel @Inject constructor(
     private fun fetchTutorListing() {
         viewModelScope.launch {
 
-            currentState.tutorListing?.tutor?.id?.let {
+            currentState.tutorListing?.tutorUser?.id?.let {
                 when (val resource = getTutorListingByTutorId(it)) {
                     is Resource.Error -> {
 

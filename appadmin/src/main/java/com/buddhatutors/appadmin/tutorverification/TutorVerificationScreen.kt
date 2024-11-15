@@ -67,7 +67,7 @@ internal fun TutorVerificationScreenContent(
 ) {
     Scaffold(topBar = {
         LargeTopAppBar(title = {
-            Text(text = uiState.tutor?.name ?: "")
+            Text(text = uiState.tutorListing?.tutorUser?.name ?: "")
         }, navigationIcon = {
             com.buddhatutors.common.ActionIconButton(
                 imageVector = Icons.Filled.ArrowBack, iconTint = Color.Black
@@ -141,7 +141,7 @@ internal fun TutorVerificationScreenContent(
 
             Text("Expertise in", style = MaterialTheme.typography.titleMedium)
 
-            uiState.tutor?.expertiseIn?.forEach {
+            uiState.tutorListing?.expertiseIn?.forEach {
                 Spacer(Modifier.height(4.dp))
                 Row {
                     Text(text = "•", style = MaterialTheme.typography.bodyMedium)
@@ -164,7 +164,7 @@ internal fun TutorVerificationScreenContent(
                 modifier = Modifier.horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                uiState.tutor?.availabilityDay?.forEach {
+                uiState.tutorListing?.availabilityDay?.forEach {
                     SuggestionChip({}, { Text(it) })
                 }
             }

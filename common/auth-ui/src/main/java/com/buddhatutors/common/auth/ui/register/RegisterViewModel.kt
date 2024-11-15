@@ -7,8 +7,7 @@ import com.buddhatutors.common.UiState
 import com.buddhatutors.domain.model.Resource
 import com.buddhatutors.domain.model.Topic
 import com.buddhatutors.domain.model.registration.TimeSlot
-import com.buddhatutors.domain.model.user.Student
-import com.buddhatutors.domain.model.user.Tutor
+import com.buddhatutors.domain.model.user.User
 import com.buddhatutors.domain.model.user.UserType
 import com.buddhatutors.domain.usecase.auth.RegisterUser
 import com.buddhatutors.domain.usecase.auth.ValidateRegistrationUseCase
@@ -88,7 +87,12 @@ internal class RegisterViewModel @Inject constructor(
 
             setState { copy(isRegistrationInProgress = true) }
 
-            val user = when (currentState.userType) {
+            val user = User(
+                id = "",
+                name = currentState.name.orEmpty(),
+                email = currentState.email.orEmpty(),
+                userType = currentState.userType
+            ) /*when (currentState.userType) {
                 UserType.STUDENT -> {
                     Student(
                         id = "",
@@ -109,7 +113,7 @@ internal class RegisterViewModel @Inject constructor(
                 }
 
                 else -> null
-            } ?: run {
+            }*/ ?: run {
                 setState { copy(isRegistrationInProgress = false) }
                 setEffect { RegisterUiEffect.ShowErrorMessage("Operation not allowed") }
                 return@launch
@@ -117,7 +121,11 @@ internal class RegisterViewModel @Inject constructor(
 
             when (val resource = registerUser(
                 model = user,
-                pass = currentState.password.orEmpty()
+                pass = currentState.password.orEmpty(),
+
+                expertiseIn = currentState.topics,
+                availabilityDay = currentState.selectedAvailabilityDay,
+                timeAvailability = currentState.selectedTimeSlot,
             )) {
                 is Resource.Error -> {
                     setEffect { RegisterUiEffect.ShowErrorMessage(resource.throwable.message.orEmpty()) }

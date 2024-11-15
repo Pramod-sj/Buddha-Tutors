@@ -2,7 +2,6 @@
 
 package com.buddhatutors.student.tutorslotbooking
 
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -43,7 +42,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -58,7 +56,7 @@ import com.buddhatutors.data.datasourceimpl.ActivityContextWrapper
 import com.buddhatutors.domain.model.Topic
 import com.buddhatutors.domain.model.tutorlisting.TutorListing
 import com.buddhatutors.domain.model.tutorlisting.Verification
-import com.buddhatutors.domain.model.user.Tutor
+import com.buddhatutors.domain.model.user.User
 import com.buddhatutors.domain.model.user.UserType
 import com.buddhatutors.student.tutorslotbooking.slotbooking.TimeBlock
 
@@ -69,19 +67,11 @@ fun PreviewTutorDetailPage() {
         TutorDetailScreenContent(
             TutorDetailUiState(
                 tutorListing = TutorListing(
-                    tutor = Tutor(
+                    tutorUser = User(
                         id = "Pramod",
                         name = "Pramod",
                         email = "",
                         userType = UserType.TUTOR,
-                        expertiseIn = listOf(
-                            Topic("", "Story telling"),
-                            Topic("", "Story telling"),
-                            Topic("", "Story telling"),
-                            Topic("", "Story telling")
-                        ),
-                        availabilityDay = listOf(),
-                        timeAvailability = null
                     ), verification = Verification(
                         isApproved = false,
                         verifiedByUserId = "",
@@ -89,8 +79,15 @@ fun PreviewTutorDetailPage() {
                         verifiedDateTime = ""
                     ), bookedSlots = listOf(
 
-                    )
-
+                    ),
+                    expertiseIn = listOf(
+                        Topic("", "Story telling"),
+                        Topic("", "Story telling"),
+                        Topic("", "Story telling"),
+                        Topic("", "Story telling")
+                    ),
+                    availabilityDay = listOf(),
+                    timeAvailability = null
                 ),
                 timeSlots = listOf()
             )
@@ -153,7 +150,7 @@ fun TutorDetailScreenContent(
         topBar = {
             MediumTopAppBar(
                 title = {
-                    Text(text = uiState.tutorListing?.tutor?.name.orEmpty())
+                    Text(text = uiState.tutorListing?.tutorUser?.name.orEmpty())
                 },
                 navigationIcon = {
                     com.buddhatutors.common.ActionIconButton(
@@ -202,7 +199,7 @@ fun TutorDetailScreenContent(
 
             Text("Expertise in", style = MaterialTheme.typography.titleMedium)
 
-            uiState.tutorListing?.tutor?.expertiseIn?.forEach {
+            uiState.tutorListing?.expertiseIn?.forEach {
                 Spacer(Modifier.height(4.dp))
                 Row {
                     Text(text = "•", style = MaterialTheme.typography.bodyMedium)
@@ -223,10 +220,10 @@ fun TutorDetailScreenContent(
             DynamicSelectTextField(
                 modifier = Modifier.fillMaxWidth(),
                 selectedValue = uiState.selectedTopic?.label.orEmpty(),
-                options = uiState.tutorListing?.tutor?.expertiseIn?.map { it.label }.orEmpty(),
+                options = uiState.tutorListing?.expertiseIn?.map { it.label }.orEmpty(),
                 label = "Choose a topic",
                 onValueChangedEvent = { value ->
-                    uiState.tutorListing?.tutor?.expertiseIn
+                    uiState.tutorListing?.expertiseIn
                         ?.find { it.label == value }
                         ?.let {
                             uiEvent(TutorDetailUiEvent.SelectTopic(it))

@@ -9,8 +9,7 @@ import com.buddhatutors.domain.datasource.MeetingDataSource
 import com.buddhatutors.domain.model.Resource
 import com.buddhatutors.domain.model.meet.MeetInfo
 import com.buddhatutors.domain.model.tutorlisting.slotbooking.BookedSlot
-import com.buddhatutors.domain.model.user.Student
-import com.buddhatutors.domain.model.user.Tutor
+import com.buddhatutors.domain.model.user.User
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.client.util.DateTime
@@ -61,7 +60,7 @@ class CalendarEventBuilder @Inject constructor() {
         return "${date}T${timeHHmm}+05:30"
     }
 
-    fun build(student: Student, tutor: Tutor, bookedSlot: BookedSlot): Event {
+    fun build(student: User, tutor: User, bookedSlot: BookedSlot): Event {
         return Event().apply {
             summary = "BuddhaTutors: Session with ${tutor.name}"
             description =
@@ -123,8 +122,8 @@ class MeetingDataSourceImpl @Inject constructor(
 
     override suspend fun scheduleMeet(
         accessToken: String,
-        student: Student,
-        tutor: Tutor,
+        student: User,
+        tutor: User,
         bookedSlot: BookedSlot
     ): Resource<MeetInfo> {
 

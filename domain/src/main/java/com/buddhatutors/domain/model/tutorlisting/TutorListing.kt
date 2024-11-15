@@ -1,22 +1,27 @@
 package com.buddhatutors.domain.model.tutorlisting
 
+import com.buddhatutors.domain.model.Topic
+import com.buddhatutors.domain.model.registration.TimeSlot
 import com.buddhatutors.domain.model.tutorlisting.slotbooking.BookedSlot
-import com.buddhatutors.domain.model.user.Tutor
+import com.buddhatutors.domain.model.user.User
 import kotlinx.serialization.Serializable
 
 /**
  * Represents a listing of a tutor, including the tutor's details,
  * verification status, and a list of booked slots.
  *
- * @param tutor The details of the tutor.
+ * @param tutorId The details of the tutor.
  * @param verification The verification status of the tutor.
  * @param bookedSlots A list of booked slots for the tutor.
  *                    Defaults to an empty list if no slots are booked.
  */
 @Serializable
 data class TutorListing(
-    val tutor: Tutor?,
-    val verification: Verification?,
+    val tutorUser: User = User(),
+    val expertiseIn: List<Topic> = emptyList(),
+    val availabilityDay: List<String> = emptyList(),
+    val timeAvailability: TimeSlot? = null,
+    val verification: Verification? = null,
     val bookedSlots: List<BookedSlot> = emptyList(),
 )
 
@@ -32,8 +37,8 @@ data class TutorListing(
  */
 @Serializable
 data class Verification(
-    val isApproved: Boolean,
-    val verifiedByUserId: String,
-    val verifiedByUserName: String,
-    val verifiedDateTime: String // Format: DateUtils.DATE_TIME_FORMAT, e.g., "01-01-2025 15:55:00"
+    val isApproved: Boolean = false,
+    val verifiedByUserId: String = "",
+    val verifiedByUserName: String = "",
+    val verifiedDateTime: String = ""// Format: DateUtils.DATE_TIME_FORMAT, e.g., "01-01-2025 15:55:00"
 )

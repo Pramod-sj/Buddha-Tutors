@@ -11,10 +11,6 @@ import com.buddhatutors.domain.SignupHandler
 import com.buddhatutors.domain.datasource.AuthDataSource
 import com.buddhatutors.domain.datasource.UserDataSource
 import com.buddhatutors.domain.model.Resource
-import com.buddhatutors.domain.model.user.Admin
-import com.buddhatutors.domain.model.user.MasterTutor
-import com.buddhatutors.domain.model.user.Student
-import com.buddhatutors.domain.model.user.Tutor
 import com.buddhatutors.domain.model.user.User
 import com.google.firebase.auth.FirebaseAuth
 import javax.inject.Inject
@@ -43,7 +39,7 @@ internal class AuthDataSourceImpl @Inject constructor(
 
                     is Resource.Error -> Resource.Error(resource.throwable)
 
-                    is Resource.Success -> Resource.Success(user)
+                    is Resource.Success -> Resource.Success(userWithGuid)
                 }
             }
 
@@ -91,12 +87,7 @@ internal class AuthDataSourceImpl @Inject constructor(
 class UserCreationService @Inject constructor() {
 
     fun createUserWithGuid(user: User, result: AuthSignupResultSuccess): User {
-        return when (user) {
-            is Student -> user.copy(id = result.uid)
-            is Tutor -> user.copy(id = result.uid)
-            is Admin -> user.copy(id = result.uid)
-            is MasterTutor -> user.copy(id = result.uid)
-        }
+        return user.copy(id = result.uid)
     }
 
 }

@@ -2,7 +2,6 @@
 
 package com.buddhatutors.student.home
 
-import android.graphics.Paint.Align
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -151,7 +150,7 @@ fun TutorItemCard(
             ) {
 
                 Text(
-                    text = tutorListing.tutor?.name.orEmpty(),
+                    text = tutorListing.tutorUser.name,
                     style = MaterialTheme.typography.titleMedium
                 )
 

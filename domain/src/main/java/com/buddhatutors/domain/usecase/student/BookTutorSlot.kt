@@ -6,10 +6,10 @@ import com.buddhatutors.domain.UserSessionDataSource
 import com.buddhatutors.domain.datasource.MeetingDataSource
 import com.buddhatutors.domain.datasource.TutorListingDataSource
 import com.buddhatutors.domain.model.Resource
+import com.buddhatutors.domain.model.tutorlisting.TutorListing
 import com.buddhatutors.domain.model.tutorlisting.slotbooking.BookedSlot
-import com.buddhatutors.domain.model.user.Student
-import com.buddhatutors.domain.model.user.Tutor
 import com.buddhatutors.domain.model.user.User
+import com.buddhatutors.domain.model.user.UserType
 import javax.inject.Inject
 
 class BookTutorSlot @Inject constructor(
@@ -20,11 +20,11 @@ class BookTutorSlot @Inject constructor(
 
     suspend operator fun invoke(
         loggedInUser: User,
-        tutor: Tutor,
+        tutor: TutorListing,
         bookedSlot: BookedSlot
     ): Resource<Unit> {
 
-        if (loggedInUser !is Student) {
+        if (loggedInUser.userType != UserType.STUDENT) {
             return Resource.Error(Throwable("Operation is not allowed by ${loggedInUser.userType}"))
         }
 
@@ -35,7 +35,7 @@ class BookTutorSlot @Inject constructor(
         return when (val meetingResource = meetingDataSource.scheduleMeet(
             accessToken = accessToken,
             student = loggedInUser,
-            tutor = tutor,
+            tutor = tutor.tutorUser,
             bookedSlot = bookedSlot
         )) {
             is Resource.Error -> {
@@ -46,7 +46,7 @@ class BookTutorSlot @Inject constructor(
                 val meetInfo = meetingResource.data
                 Log.i("MEET INFO", meetInfo.toString())
                 val resource = tutorListingDataSource.bookTutorSlot(
-                    tutorId = tutor.id,
+                    tutorId = tutor.tutorUser.id,
                     bookedSlot = bookedSlot.copy(meetInfo = meetInfo)
                 )
                 when (resource) {

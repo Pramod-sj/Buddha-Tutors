@@ -1,42 +1,22 @@
 package com.buddhatutors.data.datasourceimpl
 
-import com.buddhatutors.data.model.AdminE
-import com.buddhatutors.data.model.MasterTutorE
-import com.buddhatutors.data.model.StudentE
-import com.buddhatutors.data.model.TutorE
+import com.buddhatutors.data.model.UserEMapper
 import com.buddhatutors.data.model.UserEntity
-import com.buddhatutors.data.model.toDomain
-import com.buddhatutors.data.model.toEntity
 import com.buddhatutors.domain.datasource.UserDataSource
 import com.buddhatutors.domain.model.Resource
 import com.buddhatutors.domain.model.user.User
 import com.buddhatutors.domain.model.user.UserType
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-internal class UserDataSourceImpl @Inject constructor() : UserDataSource {
+internal class UserDataSourceImpl @Inject constructor(
+    private val userEMapper: UserEMapper
+) : UserDataSource {
 
     private val studentsDocumentReference = FirebaseFirestore.getInstance().collection("users")
-
-    private fun DocumentSnapshot.toUserObject(): UserEntity? {
-
-        return when (get("userType", Int::class.java)) {
-
-            UserType.STUDENT.id -> toObject(StudentE::class.java)
-
-            UserType.TUTOR.id -> toObject(TutorE::class.java)
-
-            UserType.ADMIN.id -> toObject(AdminE::class.java)
-
-            UserType.MASTER_TUTOR.id -> toObject(MasterTutorE::class.java)
-
-            else -> null
-        }
-    }
 
     override suspend fun getUser(userId: String): Resource<User> {
         return suspendCoroutine { continuation ->
@@ -47,7 +27,9 @@ internal class UserDataSourceImpl @Inject constructor() : UserDataSource {
                     if (it.isSuccessful) {
                         val value = it.result
                         val user = if (value?.exists() == true) {
-                            value.toUserObject()?.toDomain()
+                            value.toObject(UserEntity::class.java)?.let {
+                                userEMapper.toDomain(it)
+                            }
                         } else null
                         if (user != null) {
                             continuation.resume(Resource.Success(user))
@@ -72,7 +54,10 @@ internal class UserDataSourceImpl @Inject constructor() : UserDataSource {
                     if (it.isSuccessful) {
                         val value = it.result
                         val users = if (value?.isEmpty == false) {
-                            value.mapNotNull { it.toUserObject()?.toDomain() }
+                            value.mapNotNull {
+                                it.toObject(UserEntity::class.java)
+                                    .let { userEMapper.toDomain(it) }
+                            }
                         } else emptyList()
                         continuation.resume(Resource.Success(users))
                     } else {
@@ -88,7 +73,7 @@ internal class UserDataSourceImpl @Inject constructor() : UserDataSource {
         return suspendCoroutine { continuation ->
             studentsDocumentReference
                 .document(user.id)
-                .set(user.toEntity())
+                .set(userEMapper.toEntity(user))
                 .addOnCompleteListener {
                     if (it.isSuccessful) {
                         continuation.resume(Resource.Success(user))

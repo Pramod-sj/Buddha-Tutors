@@ -24,8 +24,6 @@ import com.buddhatutors.common.theme.BuddhaTutorTheme
 import com.buddhatutors.domain.CurrentUser
 import com.buddhatutors.domain.UserSessionDataSource
 import com.buddhatutors.domain.model.tutorlisting.TutorListing
-import com.buddhatutors.domain.model.user.Tutor
-import com.buddhatutors.domain.model.user.User
 import com.buddhatutors.student.home.StudentHomeScreen
 import com.buddhatutors.student.tutorslotbooking.TutorDetailScreen
 import com.buddhatutors.ui.splash.SplashScreen
@@ -82,7 +80,7 @@ class MainActivity : ComponentActivity() {
                             navComposable<AdminGraph.Home> { AdminHomeScreen() }
 
                             navComposable<AdminGraph.AdminTutorVerification>(
-                                typeMap = mapOf(navigationCustomArgument<Tutor>())
+                                typeMap = mapOf(navigationCustomArgument<TutorListing>())
                             ) { TutorVerificationScreen() }
 
                         }

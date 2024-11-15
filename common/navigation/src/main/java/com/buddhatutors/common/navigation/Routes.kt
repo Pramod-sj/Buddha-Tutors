@@ -1,8 +1,6 @@
 package com.buddhatutors.common.navigation
 
 import com.buddhatutors.domain.model.tutorlisting.TutorListing
-import com.buddhatutors.domain.model.user.Tutor
-import com.buddhatutors.domain.model.user.User
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -31,7 +29,7 @@ object AdminGraph {
     object Home
 
     @Serializable
-    data class AdminTutorVerification(val tutor: Tutor)
+    data class AdminTutorVerification(val tutor: TutorListing)
 
 }
 

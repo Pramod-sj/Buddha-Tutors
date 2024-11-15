@@ -1,15 +1,15 @@
 package com.buddhatutors.data.datasourceimpl
 
 import com.buddhatutors.data.model.BookedSlotEMapper
-import com.buddhatutors.data.model.toEntity
+import com.buddhatutors.data.model.UserEMapper
 import com.buddhatutors.data.model.tutorlisting.TutorListingE
 import com.buddhatutors.data.model.tutorlisting.TutorListingEMapper
 import com.buddhatutors.data.model.tutorlisting.VerificationE
+import com.buddhatutors.data.model.tutorlisting.VerificationEMapper
 import com.buddhatutors.domain.datasource.TutorListingDataSource
 import com.buddhatutors.domain.model.Resource
 import com.buddhatutors.domain.model.tutorlisting.TutorListing
 import com.buddhatutors.domain.model.tutorlisting.slotbooking.BookedSlot
-import com.buddhatutors.domain.model.user.Tutor
 import com.buddhatutors.domain.model.user.User
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -24,7 +24,9 @@ import kotlin.coroutines.suspendCoroutine
 class TutorListingDataSourceImpl @Inject constructor(
     firestore: FirebaseFirestore,
     private val tutorListingEMapper: TutorListingEMapper,
-    private val bookedSlotEMapper: BookedSlotEMapper
+    private val bookedSlotEMapper: BookedSlotEMapper,
+    private val userEMapper: UserEMapper,
+    private val verificationEMapper: VerificationEMapper
 ) : TutorListingDataSource {
 
 
@@ -102,17 +104,59 @@ class TutorListingDataSourceImpl @Inject constructor(
         }
     }
 
+    override suspend fun getUnVerifiedTutorListing(): Resource<List<TutorListing>> {
+        return suspendCoroutine { continuation ->
+            tutorsDocumentReference
+                .whereEqualTo("verification.approved", false)
+                .get()
+                .addOnCompleteListener { result ->
+                    if (result.isSuccessful) {
+                        val value = result.result
+                        val tutorListing = if (value?.isEmpty == false) {
+                            value.toObjects(TutorListingE::class.java).mapNotNull {
+                                tutorListingEMapper.toDomain(it)
+                            }
+                        } else emptyList()
+                        continuation.resume(Resource.Success(tutorListing))
+                    } else {
+                        continuation.resume(
+                            Resource.Error(result.exception ?: Exception(""))
+                        )
+                    }
+                }
+        }
+    }
+
+    override suspend fun addTutorListing(tutor: TutorListing): Resource<TutorListing> {
+
+        return suspendCoroutine { continuation ->
+
+            val tutorListing = tutorListingEMapper.toEntity(tutor)
+
+            tutorsDocumentReference
+                .document(tutor.tutorUser.id)
+                .set(tutorListing)
+                .addOnCompleteListener {
+                    val newTutorListing = tutorListingEMapper.toDomain(tutorListing)
+                    if (it.isSuccessful) {
+                        continuation.resume(Resource.Success(newTutorListing))
+                    } else {
+                        continuation.resume(
+                            Resource.Error(
+                                it.exception ?: Throwable("Something went wrong!")
+                            )
+                        )
+                    }
+                }
+        }
+
+    }
+
     override suspend fun updateTutorVerifiedStatus(
-        tutor: Tutor,
+        tutor: TutorListing,
         verifiedByUser: User,
         isApproved: Boolean
     ): Resource<TutorListing> {
-
-        val existingTutorListingItem =
-            when (val resource = getTutorListingById(tutor.id)) {
-                is Resource.Error -> null
-                is Resource.Success -> resource.data
-            }
 
         return suspendCoroutine { continuation ->
 
@@ -120,26 +164,27 @@ class TutorListingDataSourceImpl @Inject constructor(
                 SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.ENGLISH)
                     .format(Calendar.getInstance().time)
 
-            val tutorListing = TutorListingE(
-                tutor = tutor.toEntity(),
-                verification = VerificationE(
-                    approved = isApproved,
-                    verifiedByUserId = verifiedByUser.id,
-                    verifiedByUserName = verifiedByUser.name,
-                    verifiedDateTime = currentDateTime
-                ),
-                bookedSlots = existingTutorListingItem?.bookedSlots?.map {
-                    bookedSlotEMapper.toEntity(it)
-                }.orEmpty()
+            val verification = VerificationE(
+                approved = isApproved,
+                verifiedByUserId = verifiedByUser.id,
+                verifiedByUserName = verifiedByUser.name,
+                verifiedDateTime = currentDateTime
             )
 
             tutorsDocumentReference
-                .document(tutor.id)
-                .set(tutorListing)
+                .document(tutor.tutorUser.id)
+                .update("verification", verification)
                 .addOnCompleteListener {
-                    val newTutorListing = tutorListingEMapper.toDomain(tutorListing)
                     if (it.isSuccessful) {
-                        continuation.resume(Resource.Success(newTutorListing))
+                        continuation.resume(
+                            Resource.Success(
+                                tutor.copy(
+                                    verification = verificationEMapper.toDomain(
+                                        verification
+                                    )
+                                )
+                            )
+                        )
                     } else {
                         continuation.resume(
                             Resource.Error(

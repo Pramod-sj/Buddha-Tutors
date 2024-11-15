@@ -34,52 +34,13 @@ enum class UserType(val id: Int, val value: String) {
 }
 
 @Serializable
-sealed class User {
+data class User(
 
-    abstract val id: String
+    val id: String = "",
 
-    abstract val name: String
+    val name: String = "",
 
-    abstract val email: String
+    val email: String = "",
 
-    abstract val userType: UserType
-
-}
-
-@Serializable
-data class Student(
-    override val id: String,
-    override val name: String,
-    override val email: String,
-    override val userType: UserType = UserType.STUDENT
-) : User()
-
-
-@Serializable
-data class Tutor(
-    override val id: String,
-    override val name: String,
-    override val email: String,
-    override val userType: UserType = UserType.TUTOR,
-    val expertiseIn: List<Topic>? = null,
-    val availabilityDay: List<String>? = null,
-    val timeAvailability: TimeSlot? = null,
-) : User()
-
-
-@Serializable
-data class Admin(
-    override val id: String,
-    override val name: String,
-    override val email: String,
-    override val userType: UserType = UserType.ADMIN,
-) : User()
-
-
-@Serializable
-data class MasterTutor(
-    override val id: String,
-    override val name: String,
-    override val email: String,
-    override val userType: UserType = UserType.MASTER_TUTOR,
-) : User()
+    val userType: UserType = UserType.STUDENT
+)

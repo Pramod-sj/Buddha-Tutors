@@ -4,21 +4,20 @@ import com.buddhatutors.EntityMapper
 import com.buddhatutors.data.model.BookedSlotEMapper
 import com.buddhatutors.data.model.MeetInfoE
 import com.buddhatutors.data.model.TopicE
-import com.buddhatutors.data.model.TutorE
+import com.buddhatutors.data.model.TopicEMapper
 import com.buddhatutors.data.model.UserEMapper
 import com.buddhatutors.data.model.UserEntity
-import com.buddhatutors.data.model.toDomain
-import com.buddhatutors.domain.model.Topic
-import com.buddhatutors.domain.model.meet.MeetInfo
+import com.buddhatutors.domain.model.registration.TimeSlot
 import com.buddhatutors.domain.model.tutorlisting.TutorListing
 import com.buddhatutors.domain.model.tutorlisting.Verification
-import com.buddhatutors.domain.model.tutorlisting.slotbooking.BookedSlot
-import com.buddhatutors.domain.model.user.Tutor
 import com.buddhatutors.domain.model.user.User
 import javax.inject.Inject
 
 data class TutorListingE(
-    val tutor: TutorE? = null,
+    val tutorUser: UserEntity = UserEntity(),
+    val expertiseIn: List<TopicE> = emptyList(),
+    val availabilityDay: List<String> = emptyList(),
+    val timeAvailability: TimeSlot? = null,
     val verification: VerificationE? = null,
     val bookedSlots: List<BookedSlotE> = emptyList(),
 )
@@ -41,22 +40,29 @@ data class BookedSlotE(
 )
 
 class TutorListingEMapper @Inject constructor(
-    private val bookedSlotEMapper: BookedSlotEMapper,
     private val userEMapper: UserEMapper,
-    private val verificationEMapper: VerificationEMapper
+    private val bookedSlotEMapper: BookedSlotEMapper,
+    private val verificationEMapper: VerificationEMapper,
+    private val topicEMapper: TopicEMapper,
 ) : EntityMapper<TutorListingE, TutorListing> {
 
     override fun toDomain(entity: TutorListingE): TutorListing {
         return TutorListing(
-            tutor = entity.tutor?.let { userEMapper.toDomain(it) as? Tutor },
             verification = entity.verification?.let { verificationEMapper.toDomain(it) },
-            bookedSlots = entity.bookedSlots.map { bookedSlotEMapper.toDomain(it) }
+            bookedSlots = entity.bookedSlots.map { bookedSlotEMapper.toDomain(it) },
+            tutorUser = entity.tutorUser.let { userEMapper.toDomain(it) },
+            expertiseIn = entity.expertiseIn.map { topicEMapper.toDomain(it) },
+            availabilityDay = entity.availabilityDay,
+            timeAvailability = entity.timeAvailability,
         )
     }
 
     override fun toEntity(domain: TutorListing): TutorListingE {
         return TutorListingE(
-            tutor = domain.tutor?.let { userEMapper.toEntity(it) as? TutorE },
+            tutorUser = domain.tutorUser.let { userEMapper.toEntity(it) },
+            expertiseIn = domain.expertiseIn.map { topicEMapper.toEntity(it) },
+            availabilityDay = domain.availabilityDay,
+            timeAvailability = domain.timeAvailability,
             verification = domain.verification?.let { verificationEMapper.toEntity(it) },
             bookedSlots = domain.bookedSlots.map { bookedSlotEMapper.toEntity(it) }
         )

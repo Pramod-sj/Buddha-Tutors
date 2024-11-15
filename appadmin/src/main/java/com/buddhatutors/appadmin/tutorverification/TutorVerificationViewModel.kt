@@ -11,7 +11,6 @@ import com.buddhatutors.common.navigation.navigationCustomArgument
 import com.buddhatutors.domain.CurrentUser
 import com.buddhatutors.domain.model.Resource
 import com.buddhatutors.domain.model.tutorlisting.TutorListing
-import com.buddhatutors.domain.model.user.Tutor
 import com.buddhatutors.domain.usecase.admin.GetTutorListingByTutorId
 import com.buddhatutors.domain.usecase.admin.UpdateTutorVerificationState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -42,11 +41,11 @@ class TutorVerificationViewModel @Inject constructor(
 
     private fun updateVerificationStatus(isVerified: Boolean) {
         viewModelScope.launch {
-            currentState.tutor?.let { tutor ->
+            currentState.tutorListing?.let { tutor ->
                 CurrentUser.user.value?.let { user ->
                     setState { copy(isLoading = false) }
                     val resource = updateTutorVerificationState(
-                        tutor = tutor, user = user, isApproved = isVerified
+                        tutorListing = tutor, user = user, isApproved = isVerified
                     )
                     when (resource) {
                         is Resource.Error -> {
@@ -74,7 +73,7 @@ class TutorVerificationViewModel @Inject constructor(
 
     private fun fetchTutorListingIfExisting() {
         viewModelScope.launch {
-            currentState.tutor?.id?.let { tutorId ->
+            currentState.tutorListing?.tutorUser?.id?.let { tutorId ->
                 when (val resource = getTutorListingByTutorId(tutorId)) {
                     is Resource.Error -> {
                         setState {
@@ -106,9 +105,9 @@ class TutorVerificationViewModel @Inject constructor(
     init {
         setState {
             val tutor = savedStateHandle.toRoute<AdminGraph.AdminTutorVerification>(
-                mapOf(navigationCustomArgument<Tutor>())
+                mapOf(navigationCustomArgument<TutorListing>())
             ).tutor
-            copy(tutor = tutor)
+            copy(tutorListing = tutor)
         }
         fetchTutorListingIfExisting()
     }
@@ -116,7 +115,7 @@ class TutorVerificationViewModel @Inject constructor(
 }
 
 data class TutorVerificationUiState(
-    val tutor: Tutor? = null, val tutorListing: TutorListing? = null,
+    val tutorListing: TutorListing? = null,
 
     val isLoading: Boolean = false,
 

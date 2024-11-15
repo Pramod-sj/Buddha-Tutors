@@ -1,12 +1,7 @@
 package com.buddhatutors.data.datasourceimpl
 
-import com.buddhatutors.data.model.AdminE
-import com.buddhatutors.data.model.MasterTutorE
-import com.buddhatutors.data.model.StudentE
-import com.buddhatutors.data.model.TutorE
+import com.buddhatutors.data.model.UserEMapper
 import com.buddhatutors.data.model.UserEntity
-import com.buddhatutors.data.model.toDomain
-import com.buddhatutors.data.model.toEntity
 import com.buddhatutors.domain.PreferenceManager
 import com.buddhatutors.domain.UserSessionDataSource
 import com.buddhatutors.domain.model.user.User
@@ -27,12 +22,11 @@ import java.lang.reflect.Type
 import javax.inject.Inject
 
 internal class UserSessionDataSourceImpl @Inject constructor(
-    private val preferencesManager: PreferenceManager<String>
+    private val preferencesManager: PreferenceManager<String>,
+    private val userEMapper: UserEMapper
 ) : UserSessionDataSource {
 
-    private val gson: Gson = GsonBuilder()
-        .registerTypeAdapter(UserEntity::class.java, UserEntityAdapter())
-        .create()
+    private val gson: Gson = GsonBuilder().create()
 
     companion object {
         private const val USER_PREF_KEY = "user"
@@ -50,7 +44,7 @@ internal class UserSessionDataSourceImpl @Inject constructor(
         withContext(Dispatchers.IO) {
             preferencesManager.set(
                 USER_PREF_KEY,
-                gson.toJson(token.toEntity())
+                gson.toJson(userEMapper.toEntity(token))
             )
         }
     }
@@ -58,7 +52,7 @@ internal class UserSessionDataSourceImpl @Inject constructor(
     override suspend fun getUserSession(): Flow<User?> {
         return withContext(Dispatchers.IO) {
             preferencesManager.get(USER_PREF_KEY)
-                .map { gson.fromJson(it, UserEntity::class.java)?.toDomain() }
+                .map { gson.fromJson(it, UserEntity::class.java)?.let { userEMapper.toDomain(it) } }
         }
     }
 
@@ -92,6 +86,7 @@ internal class UserSessionDataSourceImpl @Inject constructor(
     }
 }
 
+/*
 
 // Custom TypeAdapter for UserEntity
 class UserEntityAdapter : JsonDeserializer<UserEntity> {
@@ -113,4 +108,4 @@ class UserEntityAdapter : JsonDeserializer<UserEntity> {
             else -> throw JsonParseException("Unknown type: $type")
         }
     }
-}
+}*/
