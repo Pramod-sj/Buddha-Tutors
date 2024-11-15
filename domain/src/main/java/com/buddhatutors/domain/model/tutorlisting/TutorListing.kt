@@ -15,8 +15,8 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class TutorListing(
-    val tutor: Tutor,
-    val verification: Verification,
+    val tutor: Tutor?,
+    val verification: Verification?,
     val bookedSlots: List<BookedSlot> = emptyList(),
 )
 

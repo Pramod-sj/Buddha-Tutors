@@ -38,6 +38,7 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.firebase.config.ktx)
+    implementation(project(":common:utils"))
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -58,5 +59,19 @@ dependencies {
     implementation(libs.moshi.adapters)
     ksp(libs.moshi.kotlin.codegen)
 
+    // Google API Client
+    implementation(libs.google.api.client.android)
+    implementation(libs.google.api.client.gson)
+    implementation(libs.google.api.services.calendar)
+
+    // For authentication using Google Sign-In
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
+
+    implementation("com.google.android.gms:play-services-auth:20.5.0")
+    implementation("com.google.auth:google-auth-library-oauth2-http:1.19.0")
+
     implementation(project(":domain"))
+
 }

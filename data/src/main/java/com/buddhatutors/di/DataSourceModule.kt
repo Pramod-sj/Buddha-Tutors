@@ -2,12 +2,18 @@ package com.buddhatutors.di
 
 import com.buddhatutors.data.FirebaseRemoteConfigManager
 import com.buddhatutors.data.datasourceimpl.AuthDataSourceImpl
+import com.buddhatutors.data.datasourceimpl.GoogleCalendarApiAuthorizeHandlerImpl
+import com.buddhatutors.data.datasourceimpl.GoogleSignInOAuthHandlerImpl
+import com.buddhatutors.data.datasourceimpl.MeetingDataSourceImpl
 import com.buddhatutors.data.datasourceimpl.TopicDataSourceImpl
 import com.buddhatutors.data.datasourceimpl.TutorListingDataSourceImpl
 import com.buddhatutors.data.datasourceimpl.UserDataSourceImpl
 import com.buddhatutors.data.datasourceimpl.UserSessionDataSourceImpl
+import com.buddhatutors.domain.GoogleScopeAuthorizeHandler
+import com.buddhatutors.domain.OAuthHandler
 import com.buddhatutors.domain.UserSessionDataSource
 import com.buddhatutors.domain.datasource.AuthDataSource
+import com.buddhatutors.domain.datasource.MeetingDataSource
 import com.buddhatutors.domain.datasource.RemoteConfigSource
 import com.buddhatutors.domain.datasource.TopicDataSource
 import com.buddhatutors.domain.datasource.TutorListingDataSource
@@ -38,5 +44,14 @@ internal interface DataSourceModule {
 
     @Binds
     fun bindTutorListingDataSource(tutorListingDataSourceImpl: TutorListingDataSourceImpl): TutorListingDataSource
+
+    @Binds
+    fun bindMeetingDataSource(meetingDataSourceImpl: MeetingDataSourceImpl): MeetingDataSource
+
+    @Binds
+    fun bindOAuthHandler(googleSignInOAuthHandlerImpl: GoogleSignInOAuthHandlerImpl): OAuthHandler
+
+    @Binds
+    fun bindGoogleScopeAuthorizeHandler(googleCalendarApiAuthorizeHandlerImpl: GoogleCalendarApiAuthorizeHandlerImpl): GoogleScopeAuthorizeHandler
 
 }

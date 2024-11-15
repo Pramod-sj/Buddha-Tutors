@@ -17,9 +17,10 @@ import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import com.google.gson.JsonParseException
-import com.google.gson.TypeAdapterFactory
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.lang.reflect.Type
@@ -35,13 +36,17 @@ internal class UserSessionDataSourceImpl @Inject constructor(
 
     companion object {
         private const val USER_PREF_KEY = "user"
+        private const val USER_TOKEN_PREF_KEY = "user_tokens"
     }
 
     override suspend fun clearSession() {
-        withContext(Dispatchers.IO) { preferencesManager.remove(USER_PREF_KEY) }
+        withContext(Dispatchers.IO) {
+            preferencesManager.remove(USER_PREF_KEY)
+            preferencesManager.remove(USER_TOKEN_PREF_KEY)
+        }
     }
 
-    override suspend fun saveAuthToken(token: User) {
+    override suspend fun saveUserSession(token: User) {
         withContext(Dispatchers.IO) {
             preferencesManager.set(
                 USER_PREF_KEY,
@@ -50,10 +55,39 @@ internal class UserSessionDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAuthToken(): Flow<User?> {
+    override suspend fun getUserSession(): Flow<User?> {
         return withContext(Dispatchers.IO) {
             preferencesManager.get(USER_PREF_KEY)
                 .map { gson.fromJson(it, UserEntity::class.java)?.toDomain() }
+        }
+    }
+
+    private val mapStringStringType =
+        TypeToken.getParameterized(Map::class.java, String::class.java, String::class.java).type
+
+    override suspend fun saveUserTokens(map: Map<String, String>) {
+        withContext(Dispatchers.IO) {
+            val currTokenMap = preferencesManager.get(USER_TOKEN_PREF_KEY).map {
+                gson.fromJson<Map<String, String>>(it, mapStringStringType)
+            }.firstOrNull().orEmpty().toMutableMap()
+            currTokenMap.putAll(map)
+            preferencesManager.set(USER_TOKEN_PREF_KEY, gson.toJson(currTokenMap))
+        }
+    }
+
+    override suspend fun getUserToken(key: String): String? {
+        return preferencesManager.get(USER_TOKEN_PREF_KEY).map {
+            gson.fromJson<Map<String, String>>(it, mapStringStringType).orEmpty()
+        }.map { it[key] }.firstOrNull()
+    }
+
+    override suspend fun removeToken(key: String) {
+        withContext(Dispatchers.IO) {
+            val currTokenMap = preferencesManager.get(USER_TOKEN_PREF_KEY).map {
+                gson.fromJson<Map<String, String>>(it, mapStringStringType).orEmpty()
+            }.firstOrNull().orEmpty().toMutableMap()
+            currTokenMap.remove(key)
+            preferencesManager.set(USER_TOKEN_PREF_KEY, gson.toJson(currTokenMap))
         }
     }
 }

@@ -21,6 +21,8 @@ import com.buddhatutors.common.navigation.Splash
 import com.buddhatutors.common.navigation.StudentGraph
 import com.buddhatutors.common.navigation.navigationCustomArgument
 import com.buddhatutors.common.theme.BuddhaTutorTheme
+import com.buddhatutors.domain.CurrentUser
+import com.buddhatutors.domain.UserSessionDataSource
 import com.buddhatutors.domain.model.tutorlisting.TutorListing
 import com.buddhatutors.domain.model.user.Tutor
 import com.buddhatutors.domain.model.user.User
@@ -28,10 +30,15 @@ import com.buddhatutors.student.home.StudentHomeScreen
 import com.buddhatutors.student.tutorslotbooking.TutorDetailScreen
 import com.buddhatutors.ui.splash.SplashScreen
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var userSessionDataSource: UserSessionDataSource
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -42,6 +49,7 @@ class MainActivity : ComponentActivity() {
             ),
         )
 
+        CurrentUser.initialize(userSessionDataSource)
 
         setContent {
 

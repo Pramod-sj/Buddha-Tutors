@@ -5,8 +5,11 @@ import com.buddhatutors.common.BaseViewModel
 import com.buddhatutors.common.UiEffect
 import com.buddhatutors.common.UiEvent
 import com.buddhatutors.common.UiState
-import com.buddhatutors.common.auth.SessionManager
-import com.buddhatutors.domain.model.user.UserType.*
+import com.buddhatutors.domain.CurrentUser
+import com.buddhatutors.domain.model.user.UserType.ADMIN
+import com.buddhatutors.domain.model.user.UserType.MASTER_TUTOR
+import com.buddhatutors.domain.model.user.UserType.STUDENT
+import com.buddhatutors.domain.model.user.UserType.TUTOR
 import com.buddhatutors.domain.usecase.remoteconfig.FetchRemoteConfigUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -15,8 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
-    private val fetchRemoteConfigUseCase: FetchRemoteConfigUseCase,
-    private val sessionManager: SessionManager
+    private val fetchRemoteConfigUseCase: FetchRemoteConfigUseCase
 ) : BaseViewModel<SplashViewModelUiEvent, SplashViewModelUiState, SplashViewModelUiEffect>() {
 
 
@@ -28,7 +30,7 @@ class SplashViewModel @Inject constructor(
                 viewModelScope.launch {
                     fetchRemoteConfigUseCase()
                     delay(1000L)
-                    when (sessionManager.getUser()?.userType) {
+                    when (CurrentUser.user.value?.userType) {
                         STUDENT -> setEffect { SplashViewModelUiEffect.NavigateToStudentFlow }
                         TUTOR -> setEffect { SplashViewModelUiEffect.NavigateToTutorHomeFlow }
                         ADMIN -> setEffect { SplashViewModelUiEffect.NavigateToAdminFlow }

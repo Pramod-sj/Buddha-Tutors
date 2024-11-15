@@ -2,9 +2,15 @@
 
 package com.buddhatutors.student.tutorslotbooking
 
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -27,22 +33,28 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.buddhatutors.common.DynamicSelectTextField
 import com.buddhatutors.common.theme.BuddhaTutorTheme
+import com.buddhatutors.data.datasourceimpl.ActivityContextWrapper
 import com.buddhatutors.domain.model.Topic
 import com.buddhatutors.domain.model.tutorlisting.TutorListing
 import com.buddhatutors.domain.model.tutorlisting.Verification
@@ -90,9 +102,41 @@ fun PreviewTutorDetailPage() {
 @Composable
 fun TutorDetailScreen() {
 
+    val context = LocalContext.current
+
     val viewModel = hiltViewModel<TutorDetailViewModel>()
 
     val uiState by viewModel.uiState.collectAsState()
+
+    val getResult =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { activityResult ->
+            if (activityResult.resultCode == 1) {
+                viewModel.setEvent(
+                    TutorDetailUiEvent.BookSlotButtonClick(
+                        ActivityContextWrapper(
+                            context
+                        )
+                    )
+                )
+            }
+        }
+
+    LaunchedEffect(Unit) {
+
+        viewModel.effect.collect {
+
+            when (it) {
+                is TutorDetailUiEffect.ShowCalendarApiScopeResolutionDialog -> {
+                    getResult.launch(
+                        IntentSenderRequest.Builder(it.pendingIntent).build()
+                    )
+                }
+            }
+
+
+        }
+
+    }
 
     TutorDetailScreenContent(uiState = uiState, uiEvent = viewModel::setEvent)
 }
@@ -102,6 +146,9 @@ fun TutorDetailScreenContent(
     uiState: TutorDetailUiState,
     uiEvent: (TutorDetailUiEvent) -> Unit
 ) {
+
+    val context = LocalContext.current
+
     Scaffold(
         topBar = {
             MediumTopAppBar(
@@ -135,12 +182,17 @@ fun TutorDetailScreenContent(
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
-
-                    }) {
+                        uiEvent(
+                            TutorDetailUiEvent.BookSlotButtonClick(
+                                ActivityContextWrapper(context)
+                            )
+                        )
+                    }, enabled = uiState.isBookSlotButtonEnabled
+                ) {
                     Text(text = "Book slot")
                 }
             }
-        }
+        },
     ) {
         Column(
             modifier = Modifier
@@ -162,9 +214,26 @@ fun TutorDetailScreenContent(
             Spacer(Modifier.height(24.dp))
 
             Text(
-                text = "Choose a slot",
+                text = "Choose a topic and slot",
                 style = MaterialTheme.typography.titleMedium
             )
+
+            Spacer(Modifier.height(12.dp))
+
+            DynamicSelectTextField(
+                modifier = Modifier.fillMaxWidth(),
+                selectedValue = uiState.selectedTopic?.label.orEmpty(),
+                options = uiState.tutorListing?.tutor?.expertiseIn?.map { it.label }.orEmpty(),
+                label = "Choose a topic",
+                onValueChangedEvent = { value ->
+                    uiState.tutorListing?.tutor?.expertiseIn
+                        ?.find { it.label == value }
+                        ?.let {
+                            uiEvent(TutorDetailUiEvent.SelectTopic(it))
+                        }
+                },
+            )
+
 
             Spacer(Modifier.height(12.dp))
 
@@ -200,6 +269,24 @@ fun TutorDetailScreenContent(
                 }
             }
 
+        }
+    }
+
+    AnimatedVisibility(
+        visible = uiState.showFullScreenLoader,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.surfaceDim.copy(0.6f))
+                .clickable { },
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(34.dp)
+            )
         }
     }
 }
@@ -241,7 +328,7 @@ internal fun DateBlock(
                 style = MaterialTheme.typography.bodySmall.copy(color = if (isSelected) Color.White else Color.Black)
             )
             Text(
-                text = dateUiModel.dateString,
+                text = dateUiModel.formattedDateString,
                 style = MaterialTheme.typography.titleSmall.copy(color = if (isSelected) Color.White else Color.Black)
             )
         }

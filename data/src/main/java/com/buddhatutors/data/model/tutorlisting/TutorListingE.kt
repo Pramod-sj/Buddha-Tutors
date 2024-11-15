@@ -1,12 +1,21 @@
 package com.buddhatutors.data.model.tutorlisting
 
+import com.buddhatutors.EntityMapper
+import com.buddhatutors.data.model.BookedSlotEMapper
+import com.buddhatutors.data.model.MeetInfoE
+import com.buddhatutors.data.model.TopicE
 import com.buddhatutors.data.model.TutorE
+import com.buddhatutors.data.model.UserEMapper
 import com.buddhatutors.data.model.UserEntity
 import com.buddhatutors.data.model.toDomain
+import com.buddhatutors.domain.model.Topic
+import com.buddhatutors.domain.model.meet.MeetInfo
 import com.buddhatutors.domain.model.tutorlisting.TutorListing
 import com.buddhatutors.domain.model.tutorlisting.Verification
 import com.buddhatutors.domain.model.tutorlisting.slotbooking.BookedSlot
 import com.buddhatutors.domain.model.user.Tutor
+import com.buddhatutors.domain.model.user.User
+import javax.inject.Inject
 
 data class TutorListingE(
     val tutor: TutorE? = null,
@@ -26,45 +35,54 @@ data class BookedSlotE(
     val startTime: String = "",
     val endTime: String = "",
     val bookedByStudentId: String = "",
-    val bookedAtDateTime: String = ""
+    val bookedAtDateTime: String = "",
+    val topic: TopicE? = null,
+    val meetInfo: MeetInfoE? = null
 )
 
-fun TutorListingE.toDomain(): TutorListing? {
-    val tutor = tutor?.toDomain() as? Tutor ?: return null
-    val verification = verification?.toDomain() ?: return null
-    return TutorListing(
-        tutor = tutor,
-        verification = verification,
-        bookedSlots = bookedSlots.map { it.toDomain() },
-    )
+class TutorListingEMapper @Inject constructor(
+    private val bookedSlotEMapper: BookedSlotEMapper,
+    private val userEMapper: UserEMapper,
+    private val verificationEMapper: VerificationEMapper
+) : EntityMapper<TutorListingE, TutorListing> {
+
+    override fun toDomain(entity: TutorListingE): TutorListing {
+        return TutorListing(
+            tutor = entity.tutor?.let { userEMapper.toDomain(it) as? Tutor },
+            verification = entity.verification?.let { verificationEMapper.toDomain(it) },
+            bookedSlots = entity.bookedSlots.map { bookedSlotEMapper.toDomain(it) }
+        )
+    }
+
+    override fun toEntity(domain: TutorListing): TutorListingE {
+        return TutorListingE(
+            tutor = domain.tutor?.let { userEMapper.toEntity(it) as? TutorE },
+            verification = domain.verification?.let { verificationEMapper.toEntity(it) },
+            bookedSlots = domain.bookedSlots.map { bookedSlotEMapper.toEntity(it) }
+        )
+    }
+
 }
 
-fun VerificationE.toDomain(): Verification {
-    return Verification(
-        isApproved = approved,
-        verifiedByUserId = verifiedByUserId,
-        verifiedByUserName = verifiedByUserName,
-        verifiedDateTime = verifiedDateTime
-    )
-}
+class VerificationEMapper @Inject constructor() : EntityMapper<VerificationE, Verification> {
 
+    override fun toDomain(entity: VerificationE): Verification {
+        return Verification(
+            isApproved = entity.approved,
+            verifiedByUserId = entity.verifiedByUserId,
+            verifiedByUserName = entity.verifiedByUserName,
+            verifiedDateTime = entity.verifiedDateTime
+        )
+    }
 
-fun BookedSlotE.toDomain(): BookedSlot {
-    return BookedSlot(
-        date = date,
-        startTime = startTime,
-        endTime = endTime,
-        bookedByStudentId = bookedByStudentId,
-        bookedAtDateTime = bookedAtDateTime
-    )
-}
+    override fun toEntity(domain: Verification): VerificationE {
+        return VerificationE(
+            approved = domain.isApproved,
+            verifiedByUserId = domain.verifiedByUserId,
+            verifiedByUserName = domain.verifiedByUserId,
+            verifiedDateTime = domain.verifiedByUserId
 
+        )
+    }
 
-fun BookedSlot.toEntity(): BookedSlotE {
-    return BookedSlotE(
-        date = date,
-        startTime = startTime,
-        endTime = endTime,
-        bookedByStudentId = bookedByStudentId
-    )
 }

@@ -381,59 +381,6 @@ internal fun RegisterScreenContent(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DynamicSelectTextField(
-    selectedValue: String,
-    options: List<String>,
-    label: String,
-    onValueChangedEvent: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded },
-        modifier = modifier
-    ) {
-        TextField(
-            readOnly = true,
-            value = selectedValue,
-            onValueChange = {},
-            label = { Text(text = label) },
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-            },
-            modifier = Modifier
-                .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
-                .fillMaxWidth(),
-            shape = MaterialTheme.shapes.small,
-            colors = TextFieldDefaults.colors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            ),
-        )
-
-        ExposedDropdownMenu(
-            modifier = Modifier.height(200.dp),
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            options.forEach { option: String ->
-                DropdownMenuItem(
-                    text = { Text(text = option) },
-                    onClick = {
-                        expanded = false
-                        onValueChangedEvent(option)
-                    }
-                )
-            }
-        }
-    }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
 fun MultiSelectTextFieldDropdown(
     selectedValues: List<String>,
     options: List<String>,

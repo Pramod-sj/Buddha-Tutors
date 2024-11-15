@@ -29,7 +29,7 @@ class LoginUser @Inject constructor(
                 )
             )
             if (resource is Resource.Success) {
-                userSessionDataSource.saveAuthToken(resource.data)
+                userSessionDataSource.saveUserSession(resource.data)
             }
             resource
         }

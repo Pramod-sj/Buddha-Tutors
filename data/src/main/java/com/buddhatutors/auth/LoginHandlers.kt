@@ -42,7 +42,7 @@ class EmailPasswordLoginHandler @Inject constructor(
 }
 
 
-class GoogleLoginHandler @Inject constructor(
+class FirebaseGoogleLoginHandler @Inject constructor(
     private val firebaseAuth: FirebaseAuth
 ) : LoginHandler {
 

@@ -4,5 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Topic(
-    val id: String? = null, val label: String = "", val isVisible: Boolean = false
+    val id: String = "", val label: String = "", val isVisible: Boolean = false
 )

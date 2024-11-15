@@ -1,11 +1,10 @@
 package com.buddhatutors.data.datasourceimpl
 
-import com.buddhatutors.data.model.toDomain
+import com.buddhatutors.data.model.BookedSlotEMapper
 import com.buddhatutors.data.model.toEntity
 import com.buddhatutors.data.model.tutorlisting.TutorListingE
+import com.buddhatutors.data.model.tutorlisting.TutorListingEMapper
 import com.buddhatutors.data.model.tutorlisting.VerificationE
-import com.buddhatutors.data.model.tutorlisting.toDomain
-import com.buddhatutors.data.model.tutorlisting.toEntity
 import com.buddhatutors.domain.datasource.TutorListingDataSource
 import com.buddhatutors.domain.model.Resource
 import com.buddhatutors.domain.model.tutorlisting.TutorListing
@@ -24,6 +23,8 @@ import kotlin.coroutines.suspendCoroutine
 
 class TutorListingDataSourceImpl @Inject constructor(
     firestore: FirebaseFirestore,
+    private val tutorListingEMapper: TutorListingEMapper,
+    private val bookedSlotEMapper: BookedSlotEMapper
 ) : TutorListingDataSource {
 
 
@@ -38,7 +39,9 @@ class TutorListingDataSourceImpl @Inject constructor(
                     if (it.isSuccessful) {
                         val value = it.result
                         val tutorListing = if (value.exists()) {
-                            it.result.toObject(TutorListingE::class.java)?.toDomain()
+                            it.result.toObject(TutorListingE::class.java)?.let {
+                                tutorListingEMapper.toDomain(it)
+                            }
                         } else null
                         if (tutorListing != null) {
                             continuation.resume(Resource.Success(tutorListing))
@@ -62,7 +65,9 @@ class TutorListingDataSourceImpl @Inject constructor(
                     if (it.isSuccessful) {
                         val value = it.result
                         val tutorListing = if (value?.isEmpty == false) {
-                            value.toObjects(TutorListingE::class.java).mapNotNull { it.toDomain() }
+                            value.toObjects(TutorListingE::class.java).mapNotNull {
+                                tutorListingEMapper.toDomain(it)
+                            }
                         } else emptyList()
                         continuation.resume(Resource.Success(tutorListing))
                     } else {
@@ -83,7 +88,9 @@ class TutorListingDataSourceImpl @Inject constructor(
                     if (result.isSuccessful) {
                         val value = result.result
                         val tutorListing = if (value?.isEmpty == false) {
-                            value.toObjects(TutorListingE::class.java).mapNotNull { it.toDomain() }
+                            value.toObjects(TutorListingE::class.java).mapNotNull {
+                                tutorListingEMapper.toDomain(it)
+                            }
                         } else emptyList()
                         continuation.resume(Resource.Success(tutorListing))
                     } else {
@@ -121,16 +128,17 @@ class TutorListingDataSourceImpl @Inject constructor(
                     verifiedByUserName = verifiedByUser.name,
                     verifiedDateTime = currentDateTime
                 ),
-                bookedSlots = existingTutorListingItem?.bookedSlots?.map { it.toEntity() }
-                    .orEmpty()
+                bookedSlots = existingTutorListingItem?.bookedSlots?.map {
+                    bookedSlotEMapper.toEntity(it)
+                }.orEmpty()
             )
 
             tutorsDocumentReference
                 .document(tutor.id)
                 .set(tutorListing)
                 .addOnCompleteListener {
-                    val newTutorListing = tutorListing.toDomain()
-                    if (it.isSuccessful && newTutorListing != null) {
+                    val newTutorListing = tutorListingEMapper.toDomain(tutorListing)
+                    if (it.isSuccessful) {
                         continuation.resume(Resource.Success(newTutorListing))
                     } else {
                         continuation.resume(
@@ -150,7 +158,10 @@ class TutorListingDataSourceImpl @Inject constructor(
         return suspendCoroutine { continuation ->
             tutorsDocumentReference
                 .document(tutorId)
-                .update("bookedSlots", FieldValue.arrayUnion(bookedSlot.toEntity()))
+                .update(
+                    "bookedSlots",
+                    FieldValue.arrayUnion(bookedSlotEMapper.toEntity(bookedSlot))
+                )
                 .addOnCompleteListener {
                     if (it.isSuccessful) {
                         continuation.resume(Resource.Success(Unit))

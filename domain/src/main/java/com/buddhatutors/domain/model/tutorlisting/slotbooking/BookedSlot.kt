@@ -1,5 +1,7 @@
 package com.buddhatutors.domain.model.tutorlisting.slotbooking
 
+import com.buddhatutors.domain.model.Topic
+import com.buddhatutors.domain.model.meet.MeetInfo
 import kotlinx.serialization.Serializable
 
 /**
@@ -16,5 +18,7 @@ data class BookedSlot(
     val startTime: String, // Format: "HH:mm", e.g., "14:00"
     val endTime: String, // Format: "HH:mm", e.g., "15:30"
     val bookedByStudentId: String, // The ID of the student who booked the slot
-    val bookedAtDateTime: String
+    val bookedAtDateTime: String,
+    val topic: Topic?,
+    val meetInfo: MeetInfo? = null
 )

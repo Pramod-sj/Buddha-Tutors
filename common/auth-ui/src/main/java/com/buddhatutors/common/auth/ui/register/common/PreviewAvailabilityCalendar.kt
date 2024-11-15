@@ -23,8 +23,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.buddhatutors.common.DynamicSelectTextField
 import com.buddhatutors.domain.model.registration.TimeSlot
-import com.buddhatutors.common.auth.ui.register.DynamicSelectTextField
 import java.util.Locale
 
 @Preview(backgroundColor = 0xFFFFFFFF)

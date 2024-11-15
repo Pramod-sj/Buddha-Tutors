@@ -43,7 +43,6 @@ android {
 
 dependencies {
 
-    implementation(project(":common:navigation"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -65,6 +64,10 @@ dependencies {
 
     implementation(libs.navigation.hilt)
 
+
     implementation(project(":common"))
+    implementation(project(":common:navigation"))
+    implementation(project(":common:utils"))
     implementation(project(":domain"))
+    implementation(project(":data"))
 }

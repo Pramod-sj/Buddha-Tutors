@@ -6,9 +6,9 @@ import androidx.navigation.toRoute
 import com.buddhatutors.common.BaseViewModel
 import com.buddhatutors.common.UiEvent
 import com.buddhatutors.common.UiState
-import com.buddhatutors.common.auth.SessionManager
 import com.buddhatutors.common.navigation.AdminGraph
 import com.buddhatutors.common.navigation.navigationCustomArgument
+import com.buddhatutors.domain.CurrentUser
 import com.buddhatutors.domain.model.Resource
 import com.buddhatutors.domain.model.tutorlisting.TutorListing
 import com.buddhatutors.domain.model.user.Tutor
@@ -43,7 +43,7 @@ class TutorVerificationViewModel @Inject constructor(
     private fun updateVerificationStatus(isVerified: Boolean) {
         viewModelScope.launch {
             currentState.tutor?.let { tutor ->
-                SessionManager.user?.let { user ->
+                CurrentUser.user.value?.let { user ->
                     setState { copy(isLoading = false) }
                     val resource = updateTutorVerificationState(
                         tutor = tutor, user = user, isApproved = isVerified
@@ -58,8 +58,10 @@ class TutorVerificationViewModel @Inject constructor(
                             setState {
                                 copy(
                                     tutorListing = tutorListing,
-                                    isApproveButtonVisible = !tutorListing.verification.isApproved,
-                                    isRejectButtonVisible = tutorListing.verification.isApproved
+                                    isApproveButtonVisible = !(tutorListing.verification?.isApproved
+                                        ?: false),
+                                    isRejectButtonVisible = tutorListing.verification?.isApproved
+                                        ?: false
                                 )
                             }
                         }
@@ -89,8 +91,10 @@ class TutorVerificationViewModel @Inject constructor(
                         setState {
                             copy(
                                 tutorListing = tutorListing,
-                                isApproveButtonVisible = !tutorListing.verification.isApproved,
-                                isRejectButtonVisible = tutorListing.verification.isApproved
+                                isApproveButtonVisible = !(tutorListing.verification?.isApproved
+                                    ?: false),
+                                isRejectButtonVisible = tutorListing.verification?.isApproved
+                                    ?: false
                             )
                         }
                     }

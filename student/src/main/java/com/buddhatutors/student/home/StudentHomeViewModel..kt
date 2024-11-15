@@ -17,8 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class StudentHomeViewModel @Inject constructor(
     private val logoutUser: LogoutUser,
-    private val getAllVerifiedTutorListing: GetAllVerifiedTutorListing,
-    private val bookTutorSlot: BookTutorSlot
+    private val getAllVerifiedTutorListing: GetAllVerifiedTutorListing
 ) : BaseViewModel<StudentHomeUiEvent, StudentHomeUiState, StudentHomeUiEffect>() {
 
     override fun createInitialState(): StudentHomeUiState = StudentHomeUiState()
