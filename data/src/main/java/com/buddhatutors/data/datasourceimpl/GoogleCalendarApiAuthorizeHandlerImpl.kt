@@ -1,14 +1,11 @@
 package com.buddhatutors.data.datasourceimpl
 
-import android.app.Activity.RESULT_OK
 import android.app.PendingIntent
 import android.content.Context
 import android.content.IntentSender
 import androidx.activity.ComponentActivity
-import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
-import com.buddhatutors.domain.ContextWrapper
 import com.buddhatutors.domain.GoogleScopeAuthorizeHandler
+import com.buddhatutors.domain.GoogleScopeResolutionException
 import com.buddhatutors.domain.IntentWrapper
 import com.buddhatutors.domain.KEY_CALENDAR_SCOPE_ACCESS_TOKEN
 import com.buddhatutors.domain.ScopeAccessToken
@@ -56,11 +53,14 @@ internal class GoogleCalendarApiAuthorizeHandlerImpl @Inject constructor(
                     if (authorizationResult.hasResolution()) {
                         val pendingIntent = authorizationResult.pendingIntent
                         try {
-                            //launcher.launch(
-                            IntentSenderRequest
-                                .Builder(pendingIntent!!.intentSender)
-                                .build()
-                            //)
+                            listOf<Int>().count { it == 1 }
+                            continuation.resume(
+                                Resource.Error(
+                                    GoogleScopeResolutionException(
+                                        pendingIntent!!
+                                    )
+                                )
+                            )
                         } catch (e: IntentSender.SendIntentException) {
                             continuation.resume(Resource.Error(Throwable("Couldn't start Authorization UI: " + e.localizedMessage)))
                         }

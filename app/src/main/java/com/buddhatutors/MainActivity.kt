@@ -103,4 +103,9 @@ class MainActivity : ComponentActivity() {
 
         }
     }
+
+    override fun onDestroy() {
+        CurrentUser.dispose()
+        super.onDestroy()
+    }
 }

@@ -2,10 +2,12 @@ package com.buddhatutors.data.datasourceimpl
 
 import android.content.Context
 import android.util.Log
+import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import com.buddhatutors.domain.ContextWrapper
+import com.buddhatutors.domain.CurrentUser
 import com.buddhatutors.domain.KEY_ID_TOKEN
 import com.buddhatutors.domain.OAuthHandler
 import com.buddhatutors.domain.UserSessionDataSource
@@ -37,7 +39,7 @@ internal class GoogleSignInOAuthHandlerImpl @Inject constructor(
 
         val existingIdToken = userSessionDataSource.getUserToken(KEY_ID_TOKEN)
 
-        if (existingIdToken != null && !isTokenExpired(existingIdToken)) {
+        if (existingIdToken != null) {
             return Resource.Success(existingIdToken)
         }
 
@@ -45,8 +47,8 @@ internal class GoogleSignInOAuthHandlerImpl @Inject constructor(
             ?: return Resource.Error(Throwable("Context provided is not a activity context"))
 
         val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-            .setAutoSelectEnabled(true)
-            .setFilterByAuthorizedAccounts(true)
+            .setAutoSelectEnabled(false)
+            .setFilterByAuthorizedAccounts(false)
             .setServerClientId(SERVER_CLIENT_ID)
             .build()
 
@@ -69,9 +71,15 @@ internal class GoogleSignInOAuthHandlerImpl @Inject constructor(
                         try {
                             val googleIdTokenCredential = GoogleIdTokenCredential
                                 .createFrom(credential.data)
-                            Log.i("idToken:", googleIdTokenCredential.idToken)
-                            Resource.Success(googleIdTokenCredential.idToken).also {
-                                userSessionDataSource.saveUserTokens(map = mapOf(KEY_ID_TOKEN to it.data))
+
+                            if (googleIdTokenCredential.id == CurrentUser.user.value?.email) {
+                                Log.i("idToken:", googleIdTokenCredential.idToken)
+                                Resource.Success(googleIdTokenCredential.idToken).also {
+                                    userSessionDataSource.saveUserTokens(map = mapOf(KEY_ID_TOKEN to it.data))
+                                }
+                            } else {
+                                credentialManager.clearCredentialState(ClearCredentialStateRequest())
+                                Resource.Error(Throwable("Please select the email id you used to login"))
                             }
                         } catch (e: GoogleIdTokenParsingException) {
                             Resource.Error(Throwable("Received an invalid google id token response: " + e.message))
