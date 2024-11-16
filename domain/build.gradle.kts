@@ -1,13 +1,12 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt.android)
     id("kotlin-parcelize")
     alias(libs.plugins.kotlin.serializable)
 }
 
 android {
+
     namespace = "com.buddhatutors.domain"
     compileSdk = 34
 
@@ -38,21 +37,14 @@ android {
 
 dependencies {
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-
-    ksp(libs.hilt.compiler)
-    implementation(libs.hilt.android)
-
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-
-    implementation(libs.gson)
-
+    implementation(libs.javax.inject)
+    implementation(libs.kotlinx.coroutines.core)
 
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.gson)
+
 }

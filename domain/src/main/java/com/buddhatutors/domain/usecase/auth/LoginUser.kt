@@ -6,11 +6,9 @@ import com.buddhatutors.domain.UserSessionDataSource
 import com.buddhatutors.domain.datasource.AuthDataSource
 import com.buddhatutors.domain.model.Resource
 import com.buddhatutors.domain.model.user.User
-import dagger.hilt.android.scopes.ViewModelScoped
 import javax.inject.Inject
 
 
-@ViewModelScoped
 class LoginUser @Inject constructor(
     private val authDataSource: AuthDataSource,
     private val userSessionDataSource: UserSessionDataSource

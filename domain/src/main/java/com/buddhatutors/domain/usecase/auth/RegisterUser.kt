@@ -11,10 +11,8 @@ import com.buddhatutors.domain.model.tutorlisting.TutorListing
 import com.buddhatutors.domain.model.tutorlisting.Verification
 import com.buddhatutors.domain.model.user.User
 import com.buddhatutors.domain.model.user.UserType
-import dagger.hilt.android.scopes.ViewModelScoped
 import javax.inject.Inject
 
-@ViewModelScoped
 class RegisterUser @Inject constructor(
     private val authDataSource: AuthDataSource,
     private val tutorListingDataSource: TutorListingDataSource

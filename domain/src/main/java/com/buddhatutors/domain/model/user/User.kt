@@ -1,8 +1,5 @@
 package com.buddhatutors.domain.model.user
 
-import com.buddhatutors.domain.model.Topic
-import com.buddhatutors.domain.model.registration.TimeSlot
-import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.Serializable
 
 
