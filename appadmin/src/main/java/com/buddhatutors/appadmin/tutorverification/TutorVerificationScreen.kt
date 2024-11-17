@@ -164,7 +164,7 @@ internal fun TutorVerificationScreenContent(
                 modifier = Modifier.horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                uiState.tutorListing?.availabilityDay?.forEach {
+                uiState.tutorListing?.availableDays?.forEach {
                     SuggestionChip({}, { Text(it) })
                 }
             }

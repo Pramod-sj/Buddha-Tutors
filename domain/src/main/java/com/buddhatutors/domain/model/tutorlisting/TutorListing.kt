@@ -19,8 +19,8 @@ import kotlinx.serialization.Serializable
 data class TutorListing(
     val tutorUser: User = User(),
     val expertiseIn: List<Topic> = emptyList(),
-    val availabilityDay: List<String> = emptyList(),
-    val timeAvailability: TimeSlot? = null,
+    val availableDays: List<String> = emptyList(),
+    val availableTimeSlots: List<TimeSlot> = emptyList(),
     val verification: Verification? = null,
     val bookedSlots: List<BookedSlot> = emptyList(),
 )

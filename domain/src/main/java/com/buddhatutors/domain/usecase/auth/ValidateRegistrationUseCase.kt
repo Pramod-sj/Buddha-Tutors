@@ -19,7 +19,7 @@ class ValidateRegistrationUseCase @Inject constructor() {
         confirmPassword: String?,
         userType: UserType?,
         selectedAvailabilityDay: List<String>?,
-        selectedTimeSlot: TimeSlot?,
+        selectedTimeSlots: List<TimeSlot>,
         selectedTopics: List<Topic>?,
     ): ValidationResult {
 
@@ -31,10 +31,9 @@ class ValidateRegistrationUseCase @Inject constructor() {
             isPasswordValid = password?.let { password.length >= 6 } ?: true,
             isConfirmPasswordValid = password == confirmPassword,
             isAvailabilityDaySelected = if (isStudent) null else selectedAvailabilityDay?.isNotEmpty(),
-            isTimeSlotValid = if (isStudent) null else isTimeSlotValid(
-                start = selectedTimeSlot?.start,
-                end = selectedTimeSlot?.end
-            ),
+            isTimeSlotValid = if (isStudent) null else selectedTimeSlots.all {
+                isTimeSlotValid(start = it.start, end = it.end)
+            },
             isTopicsSelected = if (isStudent) null else selectedTopics?.isNotEmpty()
         )
     }

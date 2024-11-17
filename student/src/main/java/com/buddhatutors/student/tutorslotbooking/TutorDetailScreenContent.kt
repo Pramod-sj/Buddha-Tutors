@@ -37,11 +37,15 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -65,6 +69,7 @@ import com.buddhatutors.student.tutorslotbooking.slotbooking.TimeBlock
 fun PreviewTutorDetailPage() {
     BuddhaTutorTheme {
         TutorDetailScreenContent(
+            modifier = Modifier,
             TutorDetailUiState(
                 tutorListing = TutorListing(
                     tutorUser = User(
@@ -86,8 +91,8 @@ fun PreviewTutorDetailPage() {
                         Topic("", "Story telling"),
                         Topic("", "Story telling")
                     ),
-                    availabilityDay = listOf(),
-                    timeAvailability = null
+                    availableDays = listOf(),
+                    availableTimeSlots = listOf()
                 ),
                 timeSlots = listOf()
             )
@@ -104,6 +109,8 @@ fun TutorDetailScreen() {
     val viewModel = hiltViewModel<TutorDetailViewModel>()
 
     val uiState by viewModel.uiState.collectAsState()
+
+    val snackBarHostState = remember { SnackbarHostState() }
 
     val getResult =
         rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { activityResult ->
@@ -128,24 +135,18 @@ fun TutorDetailScreen() {
                         IntentSenderRequest.Builder(it.pendingIntent).build()
                     )
                 }
-            }
 
+                is TutorDetailUiEffect.ShowErrorMessage -> {
+                    snackBarHostState.showSnackbar(
+                        message = it.message,
+                        duration = SnackbarDuration.Short
+                    )
+                }
+            }
 
         }
 
     }
-
-    TutorDetailScreenContent(uiState = uiState, uiEvent = viewModel::setEvent)
-}
-
-@Composable
-fun TutorDetailScreenContent(
-    uiState: TutorDetailUiState,
-    uiEvent: (TutorDetailUiEvent) -> Unit
-) {
-
-    val context = LocalContext.current
-
     Scaffold(
         topBar = {
             MediumTopAppBar(
@@ -179,7 +180,7 @@ fun TutorDetailScreenContent(
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
-                        uiEvent(
+                        viewModel.setEvent(
                             TutorDetailUiEvent.BookSlotButtonClick(
                                 ActivityContextWrapper(context)
                             )
@@ -190,83 +191,13 @@ fun TutorDetailScreenContent(
                 }
             }
         },
+        snackbarHost = { SnackbarHost(snackBarHostState) }
     ) {
-        Column(
-            modifier = Modifier
-                .padding(it)
-                .padding(horizontal = 16.dp)
-        ) {
-
-            Text("Expertise in", style = MaterialTheme.typography.titleMedium)
-
-            uiState.tutorListing?.expertiseIn?.forEach {
-                Spacer(Modifier.height(4.dp))
-                Row {
-                    Text(text = "•", style = MaterialTheme.typography.bodyMedium)
-                    Spacer(Modifier.width(4.dp))
-                    Text(text = it.label, style = MaterialTheme.typography.bodyMedium)
-                }
-            }
-
-            Spacer(Modifier.height(24.dp))
-
-            Text(
-                text = "Choose a topic and slot",
-                style = MaterialTheme.typography.titleMedium
-            )
-
-            Spacer(Modifier.height(12.dp))
-
-            DynamicSelectTextField(
-                modifier = Modifier.fillMaxWidth(),
-                selectedValue = uiState.selectedTopic?.label.orEmpty(),
-                options = uiState.tutorListing?.expertiseIn?.map { it.label }.orEmpty(),
-                label = "Choose a topic",
-                onValueChangedEvent = { value ->
-                    uiState.tutorListing?.expertiseIn
-                        ?.find { it.label == value }
-                        ?.let {
-                            uiEvent(TutorDetailUiEvent.SelectTopic(it))
-                        }
-                },
-            )
-
-
-            Spacer(Modifier.height(12.dp))
-
-            Row(
-                modifier = Modifier.horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                uiState.dateSlots.forEach { dateSlot ->
-                    DateBlock(
-                        dateUiModel = dateSlot,
-                        isSelected = dateSlot == uiState.selectedDateSlot,
-                        onClick = {
-                            uiEvent(TutorDetailUiEvent.SelectDate(it))
-                        }
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(12.dp))
-
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                uiState.timeSlots.forEach { timeSlot ->
-                    TimeBlock(
-                        slotTimeUiModel = timeSlot,
-                        isSelected = timeSlot == uiState.selectedTimeSlot,
-                        onClick = {
-                            uiEvent(TutorDetailUiEvent.SelectTimeSlot(it))
-                        }
-                    )
-                }
-            }
-
-        }
+        TutorDetailScreenContent(
+            modifier = Modifier.padding(it),
+            uiState = uiState,
+            uiEvent = viewModel::setEvent
+        )
     }
 
     AnimatedVisibility(
@@ -286,6 +217,90 @@ fun TutorDetailScreenContent(
             )
         }
     }
+}
+
+@Composable
+fun TutorDetailScreenContent(
+    modifier: Modifier = Modifier,
+    uiState: TutorDetailUiState,
+    uiEvent: (TutorDetailUiEvent) -> Unit
+) {
+
+    Column(
+        modifier = Modifier.padding(horizontal = 16.dp)
+    ) {
+
+        Text("Expertise in", style = MaterialTheme.typography.titleMedium)
+
+        uiState.tutorListing?.expertiseIn?.forEach {
+            Spacer(Modifier.height(4.dp))
+            Row {
+                Text(text = "•", style = MaterialTheme.typography.bodyMedium)
+                Spacer(Modifier.width(4.dp))
+                Text(text = it.label, style = MaterialTheme.typography.bodyMedium)
+            }
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+        Text(
+            text = "Choose a topic and slot",
+            style = MaterialTheme.typography.titleMedium
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        DynamicSelectTextField(
+            modifier = Modifier.fillMaxWidth(),
+            selectedValue = uiState.selectedTopic?.label.orEmpty(),
+            options = uiState.tutorListing?.expertiseIn?.map { it.label }.orEmpty(),
+            label = "Choose a topic",
+            onValueChangedEvent = { value ->
+                uiState.tutorListing?.expertiseIn
+                    ?.find { it.label == value }
+                    ?.let {
+                        uiEvent(TutorDetailUiEvent.SelectTopic(it))
+                    }
+            },
+        )
+
+
+        Spacer(Modifier.height(12.dp))
+
+        Row(
+            modifier = Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            uiState.dateSlots.forEach { dateSlot ->
+                DateBlock(
+                    dateUiModel = dateSlot,
+                    isSelected = dateSlot == uiState.selectedDateSlot,
+                    onClick = {
+                        uiEvent(TutorDetailUiEvent.SelectDate(it))
+                    }
+                )
+            }
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            uiState.timeSlots.forEach { timeSlot ->
+                TimeBlock(
+                    slotTimeUiModel = timeSlot,
+                    isSelected = timeSlot == uiState.selectedTimeSlot,
+                    onClick = {
+                        uiEvent(TutorDetailUiEvent.SelectTimeSlot(it))
+                    }
+                )
+            }
+        }
+
+    }
+
 }
 
 @Preview

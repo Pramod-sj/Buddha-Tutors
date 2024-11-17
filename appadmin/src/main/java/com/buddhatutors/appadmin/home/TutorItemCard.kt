@@ -31,8 +31,8 @@ fun PreviewTutorItemCard() {
                     Topic("", "Test 2"),
                     Topic("", "Test 3")
                 ),
-                availabilityDay = listOf(),
-                timeAvailability = null
+                availableDays = listOf(),
+                availableTimeSlots = listOf()
             )
         )
     }

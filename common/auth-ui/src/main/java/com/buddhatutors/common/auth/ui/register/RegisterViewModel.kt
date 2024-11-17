@@ -7,6 +7,7 @@ import com.buddhatutors.common.UiState
 import com.buddhatutors.domain.model.Resource
 import com.buddhatutors.domain.model.Topic
 import com.buddhatutors.domain.model.registration.TimeSlot
+import com.buddhatutors.domain.model.registration.ValidationResult
 import com.buddhatutors.domain.model.user.User
 import com.buddhatutors.domain.model.user.UserType
 import com.buddhatutors.domain.usecase.auth.RegisterUser
@@ -56,8 +57,16 @@ internal class RegisterViewModel @Inject constructor(
                 setState { copy(selectedAvailabilityDay = event.days) }
             }
 
-            is RegisterUiEvent.OnTimeAvailabilityChanged -> {
-                setState { copy(selectedTimeSlot = event.timeSlot) }
+            is RegisterUiEvent.OnTimeSlotAdded -> {
+                val newList = currentState.selectedTimeSlots
+                    .toMutableList()
+                    .apply { add(event.timeSlot) }
+                setState {
+                    copy(
+                        selectedTimeSlots = newList.toMutableSet().toList(),
+                        isTimepickerDialogVisible = false
+                    )
+                }
             }
 
             is RegisterUiEvent.OnExpertiseTopicChanged -> {
@@ -79,6 +88,15 @@ internal class RegisterViewModel @Inject constructor(
                 setState { copy(isTermConditionAccepted = event.isAccepted) }
             }
 
+            is RegisterUiEvent.UpdateTimePickerDialogVisibility -> {
+                setState { copy(isTimepickerDialogVisible = event.isVisible) }
+            }
+
+            is RegisterUiEvent.OnTimeSlotRemoved -> {
+                val newList = currentState.selectedTimeSlots.toMutableList()
+                    .apply { remove(event.timeSlot) }
+                setState { copy(selectedTimeSlots = newList.toMutableSet().toList()) }
+            }
         }
     }
 
@@ -125,7 +143,7 @@ internal class RegisterViewModel @Inject constructor(
 
                 expertiseIn = currentState.topics,
                 availabilityDay = currentState.selectedAvailabilityDay,
-                timeAvailability = currentState.selectedTimeSlot,
+                timeSlots = currentState.selectedTimeSlots,
             )) {
                 is Resource.Error -> {
                     setEffect { RegisterUiEffect.ShowErrorMessage(resource.throwable.message.orEmpty()) }
@@ -139,7 +157,7 @@ internal class RegisterViewModel @Inject constructor(
                             password = "",
                             confirmPassword = "",
                             selectedTopics = emptyList(),
-                            selectedTimeSlot = TimeSlot(null, null),
+                            selectedTimeSlots = emptyList(),
                             userType = UserType.STUDENT,
                             selectedAvailabilityDay = emptyList(),
                         )
@@ -162,7 +180,7 @@ internal class RegisterViewModel @Inject constructor(
                     confirmPassword = currentState.confirmPassword,
                     userType = currentState.userType,
                     selectedAvailabilityDay = currentState.selectedAvailabilityDay,
-                    selectedTimeSlot = currentState.selectedTimeSlot,
+                    selectedTimeSlots = currentState.selectedTimeSlots,
                     selectedTopics = currentState.topics
                 )
                 setState {
@@ -207,7 +225,9 @@ internal sealed class RegisterUiEvent : com.buddhatutors.common.UiEvent {
 
     data class OnDayAvailabilityChanged(val days: List<String>) : RegisterUiEvent()
 
-    data class OnTimeAvailabilityChanged(val timeSlot: TimeSlot) : RegisterUiEvent()
+    data class OnTimeSlotAdded(val timeSlot: TimeSlot) : RegisterUiEvent()
+
+    data class OnTimeSlotRemoved(val timeSlot: TimeSlot) : RegisterUiEvent()
 
     data class OnExpertiseTopicChanged(val topics: List<String>) : RegisterUiEvent()
 
@@ -217,12 +237,22 @@ internal sealed class RegisterUiEvent : com.buddhatutors.common.UiEvent {
 
     data class OnTermsAndConditionsStateChanged(val isAccepted: Boolean) : RegisterUiEvent()
 
+    data class UpdateTimePickerDialogVisibility(val isVisible: Boolean) : RegisterUiEvent()
 }
 
 
 internal data class RegisterUiState(
 
     val topics: List<Topic> = emptyList(),
+    val days: List<Pair<String, String>> = listOf(
+        "Mon" to "Monday",
+        "Tue" to "Tuesday",
+        "Wed" to "Wednesday",
+        "Thu" to "Thursday",
+        "Fri" to "Friday",
+        "Sat" to "Saturday",
+        "Sun" to "Sunday"
+    ),
 
     val name: String? = null,
     val email: String? = null,
@@ -230,7 +260,7 @@ internal data class RegisterUiState(
     val confirmPassword: String? = null,
     val userType: UserType = UserType.STUDENT,
     val selectedAvailabilityDay: List<String> = emptyList(),
-    val selectedTimeSlot: TimeSlot = TimeSlot(null, null),
+    val selectedTimeSlots: List<TimeSlot> = emptyList(),
     val selectedTopics: List<Topic> = emptyList(),
 
     val isTermConditionAccepted: Boolean = false,
@@ -238,7 +268,10 @@ internal data class RegisterUiState(
     val isRegistrationValid: Boolean = false,
     val isRegistrationInProgress: Boolean = false,
 
-    val validationResult: com.buddhatutors.domain.model.registration.ValidationResult? = null
+    val validationResult: ValidationResult? = null,
+
+
+    val isTimepickerDialogVisible: Boolean = false
 
 ) : UiState
 

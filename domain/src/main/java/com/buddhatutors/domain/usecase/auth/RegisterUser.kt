@@ -24,7 +24,7 @@ class RegisterUser @Inject constructor(
 
         expertiseIn: List<Topic> = emptyList(),
         availabilityDay: List<String> = emptyList(),
-        timeAvailability: TimeSlot? = null,
+        timeSlots: List<TimeSlot> = emptyList(),
     ): Resource<User> {
         return if (model.email.isEmpty()) {
             Resource.Error(Throwable("Email cannot be empty"))
@@ -46,8 +46,8 @@ class RegisterUser @Inject constructor(
                             TutorListing(
                                 tutorUser = resource.data,
                                 expertiseIn = expertiseIn,
-                                availabilityDay = availabilityDay,
-                                timeAvailability = timeAvailability,
+                                availableDays = availabilityDay,
+                                availableTimeSlots = timeSlots,
                                 verification = Verification(isApproved = false),
                                 bookedSlots = listOf(),
                             )

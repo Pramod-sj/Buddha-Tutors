@@ -112,6 +112,7 @@ class TutorDetailViewModel @Inject constructor(
                             } else {
                                 //handle error message state
                                 Log.e(TAG, "ERROR:", resource.throwable)
+                                setEffect { TutorDetailUiEffect.ShowErrorMessage(resource.throwable.message.orEmpty()) }
                             }
                         }
 
@@ -154,6 +155,8 @@ class TutorDetailViewModel @Inject constructor(
             is Resource.Error -> {
                 //handle error case
                 Log.e("TAG", "ERROR", resource.throwable)
+                setEffect { TutorDetailUiEffect.ShowErrorMessage(resource.throwable.message.orEmpty()) }
+
             }
 
             is Resource.Success -> {
@@ -169,7 +172,7 @@ class TutorDetailViewModel @Inject constructor(
 
     private fun generateDates(tutorListing: TutorListing?): List<SlotDateUiModel> {
 
-        val days = tutorListing?.availabilityDay?.map {
+        val days = tutorListing?.availableDays?.map {
             when (it.lowercase()) {
                 "mon" -> Calendar.MONDAY
                 "tue" -> Calendar.TUESDAY
@@ -212,21 +215,22 @@ class TutorDetailViewModel @Inject constructor(
         tutorListing: TutorListing
     ): List<SlotTimeUiModel> {
 
-        val isSlotBooked = tutorListing.bookedSlots.any {
-            it.date == dateSlotUiModel.dateString
-                    && it.startTime == tutorListing?.timeAvailability?.start.orEmpty()
-                    && it.endTime == tutorListing?.timeAvailability?.end.orEmpty()
-        }
+        return tutorListing.availableTimeSlots.map { slot ->
 
-        return listOf(
+            val isSlotBooked = tutorListing.bookedSlots.any {
+                it.date == dateSlotUiModel.dateString
+                        && it.startTime == slot.start.orEmpty()
+                        && it.endTime == slot.end.orEmpty()
+            }
+
             SlotTimeUiModel(
                 dateString = dateSlotUiModel.formattedDateString,
-                startTime = tutorListing?.timeAvailability?.start.orEmpty(),
-                endTime = tutorListing?.timeAvailability?.end.orEmpty(),
+                startTime = slot.start.orEmpty(),
+                endTime = slot.end.orEmpty(),
                 isSlotBooked = isSlotBooked
             )
-        )
 
+        }
     }
 
     private fun fetchTutorListing() {
@@ -234,9 +238,7 @@ class TutorDetailViewModel @Inject constructor(
 
             currentState.tutorListing?.tutorUser?.id?.let {
                 when (val resource = getTutorListingByTutorId(it)) {
-                    is Resource.Error -> {
-
-                    }
+                    is Resource.Error -> Unit
 
                     is Resource.Success -> {
                         setState { copy(tutorListing = resource.data) }
@@ -328,5 +330,8 @@ sealed class TutorDetailUiEffect : UiEffect {
 
     data class ShowCalendarApiScopeResolutionDialog(val pendingIntent: PendingIntent) :
         TutorDetailUiEffect()
+
+
+    data class ShowErrorMessage(val message: String) : TutorDetailUiEffect()
 
 }
