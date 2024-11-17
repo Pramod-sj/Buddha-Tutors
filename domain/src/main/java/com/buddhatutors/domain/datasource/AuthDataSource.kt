@@ -18,6 +18,8 @@ interface AuthDataSource {
         authLoginRequestPayload: AuthLoginRequestPayload
     ): Resource<User>
 
+    suspend fun sendVerificationEmail(): Resource<Boolean>
+
     suspend fun logout(): Resource<Boolean>
 
 }

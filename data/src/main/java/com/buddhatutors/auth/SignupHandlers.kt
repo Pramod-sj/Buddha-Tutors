@@ -8,7 +8,8 @@ import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-data class AuthSignupResultSuccess(val uid: String) : AuthSignupResult
+data class AuthSignupResultSuccess(val uid: String, val emailVerificationSent: Boolean) :
+    AuthSignupResult
 
 data class AuthSignupResultFailure(val message: String) : AuthSignupResult
 
@@ -24,8 +25,22 @@ class EmailPasswordSignupHandler @Inject constructor(
                     authSignupRequestPayload.user.email,
                     authSignupRequestPayload.password
                 ).addOnCompleteListener {
-                    if (it.isSuccessful) {
-                        continuation.resume(AuthSignupResultSuccess(it.result.user?.uid.orEmpty()))
+                    val user = it.result.user
+                    if (it.isSuccessful && user != null) {
+                        user.sendEmailVerification()
+                            .addOnCompleteListener { result ->
+                                if (result.isSuccessful) {
+                                    continuation.resume(
+                                        AuthSignupResultSuccess(
+                                            uid = user.uid,
+                                            emailVerificationSent = true
+                                        )
+                                    )
+                                } else {
+                                    firebaseAuth.signOut()
+                                    continuation.resume(AuthSignupResultFailure("Failed to send verification to provided email id"))
+                                }
+                            }
                     } else {
                         continuation.resume(AuthSignupResultFailure(it.exception?.message.orEmpty()))
                     }

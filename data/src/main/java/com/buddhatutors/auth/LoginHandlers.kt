@@ -15,8 +15,9 @@ data class OAuthCredentialImpl(val authCredential: AuthCredential) : OAuthCreden
 
 data class AuthResultSuccess(val uid: String) : AuthLoginResult
 
-data class AuthResultFailure(val message: String) : AuthLoginResult
+data class AuthResultFailure(val throwable: Throwable) : AuthLoginResult
 
+data class EmailNotVerifiedException(override val message: String) : Throwable()
 
 class EmailPasswordLoginHandler @Inject constructor(
     private val firebaseAuth: FirebaseAuth
@@ -28,15 +29,20 @@ class EmailPasswordLoginHandler @Inject constructor(
                 firebaseAuth.signInWithEmailAndPassword(
                     authLoginRequestPayload.email,
                     authLoginRequestPayload.password
-                ).addOnCompleteListener {
-                    if (it.isSuccessful) {
-                        continuation.resume(AuthResultSuccess(it.result.user?.uid.orEmpty()))
+                ).addOnCompleteListener { result ->
+                    val user = result.result.user
+                    if (result.isSuccessful && user != null) {
+                        if (user.isEmailVerified) {
+                            continuation.resume(AuthResultSuccess(result.result.user?.uid.orEmpty()))
+                        } else {
+                            continuation.resume(AuthResultFailure(EmailNotVerifiedException("Your email is not verified. Please verify your email to continue.")))
+                        }
                     } else {
-                        continuation.resume(AuthResultFailure(it.exception?.message.orEmpty()))
+                        continuation.resume(AuthResultFailure(Throwable(result.exception?.message.orEmpty())))
                     }
                 }
             }
-        } else AuthResultFailure("Authentication payload not supported")
+        } else AuthResultFailure(Throwable("Authentication payload not supported"))
     }
 
 }
@@ -54,11 +60,11 @@ class FirebaseGoogleLoginHandler @Inject constructor(
                         if (it.isSuccessful) {
                             continuation.resume(AuthResultSuccess(it.result.user?.uid.orEmpty()))
                         } else {
-                            continuation.resume(AuthResultFailure(it.exception?.message.orEmpty()))
+                            continuation.resume(AuthResultFailure(Throwable(it.exception?.message.orEmpty())))
                         }
                     }
             }
-        } else AuthResultFailure("Authentication payload not supported")
+        } else AuthResultFailure(Throwable("Authentication payload not supported"))
     }
 
 }

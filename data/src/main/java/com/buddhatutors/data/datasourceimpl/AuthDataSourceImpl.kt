@@ -6,6 +6,7 @@ import com.buddhatutors.auth.AuthSignupResultFailure
 import com.buddhatutors.auth.AuthSignupResultSuccess
 import com.buddhatutors.domain.AuthLoginRequestPayload
 import com.buddhatutors.domain.AuthSignupRequestPayload
+import com.buddhatutors.domain.EmailVerificationService
 import com.buddhatutors.domain.LoginHandler
 import com.buddhatutors.domain.SignupHandler
 import com.buddhatutors.domain.datasource.AuthDataSource
@@ -19,7 +20,8 @@ internal class AuthDataSourceImpl @Inject constructor(
     private val loginHandlers: Map<String, @JvmSuppressWildcards LoginHandler>,
     private val signupHandlers: Map<String, @JvmSuppressWildcards SignupHandler>,
     private val userDataSource: UserDataSource,
-    private val userCreationService: UserCreationService
+    private val userCreationService: UserCreationService,
+    private val emailVerificationService: EmailVerificationService
 ) : AuthDataSource {
 
     override suspend fun signUp(
@@ -66,7 +68,7 @@ internal class AuthDataSourceImpl @Inject constructor(
             }
 
             is AuthResultFailure -> {
-                Resource.Error(Throwable(result.message))
+                Resource.Error(result.throwable)
             }
 
             else -> {
@@ -74,6 +76,10 @@ internal class AuthDataSourceImpl @Inject constructor(
             }
         }
 
+    }
+
+    override suspend fun sendVerificationEmail(): Resource<Boolean> {
+        return emailVerificationService.sendVerificationEmail()
     }
 
     override suspend fun logout(): Resource<Boolean> {

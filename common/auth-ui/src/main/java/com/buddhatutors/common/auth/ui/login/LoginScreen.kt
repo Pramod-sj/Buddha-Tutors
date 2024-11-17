@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -44,7 +45,6 @@ import com.buddhatutors.common.Navigator
 import com.buddhatutors.common.navigation.AdminGraph
 import com.buddhatutors.common.navigation.AuthGraph
 import com.buddhatutors.common.navigation.MasterTutorGraph
-import com.buddhatutors.common.navigation.Splash
 import com.buddhatutors.common.navigation.StudentGraph
 import com.buddhatutors.common.navigation.TutorGraph
 import kotlinx.coroutines.flow.flow
@@ -178,9 +178,15 @@ internal fun LoginScreenContent(
     LaunchedEffect(Unit) {
         uiEffect.collect { uiEffect ->
             when (uiEffect) {
-                is LoginUiEffect.ShowErrorMessage -> {
+                is LoginUiEffect.ShowMessage -> {
                     coroutineScope.launch {
-                        snackBarHostState.showSnackbar(message = uiEffect.message)
+                        val result = snackBarHostState.showSnackbar(
+                            message = uiEffect.message,
+                            actionLabel = uiEffect.actionButtonLabel
+                        )
+                        if (result == SnackbarResult.ActionPerformed) {
+                            uiEffect.actionButtonCallback?.invoke()
+                        }
                     }
                 }
 

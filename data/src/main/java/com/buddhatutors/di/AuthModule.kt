@@ -2,9 +2,11 @@ package com.buddhatutors.di
 
 import com.buddhatutors.auth.EmailPasswordLoginHandler
 import com.buddhatutors.auth.EmailPasswordSignupHandler
+import com.buddhatutors.auth.FirebaseEmailVerificationService
 import com.buddhatutors.auth.FirebaseGoogleLoginHandler
 import com.buddhatutors.domain.EMAIL_SIGN_IN_METHOD_NAME
 import com.buddhatutors.domain.EMAIL_SIGN_UP_METHOD_NAME
+import com.buddhatutors.domain.EmailVerificationService
 import com.buddhatutors.domain.GOOGLE_SIGN_IN_METHOD_NAME
 import com.buddhatutors.domain.LoginHandler
 import com.buddhatutors.domain.SignupHandler
@@ -34,4 +36,6 @@ interface AuthModule {
     @StringKey(EMAIL_SIGN_UP_METHOD_NAME)
     fun bindEmailPasswordSignupHandler(emailPasswordSignupHandler: EmailPasswordSignupHandler): SignupHandler
 
+    @Binds
+    fun bindEmailVerificationService(firebaseEmailVerificationService: FirebaseEmailVerificationService): EmailVerificationService
 }

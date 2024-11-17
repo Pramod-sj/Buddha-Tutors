@@ -1,6 +1,7 @@
 package com.buddhatutors.common.auth.ui.login
 
 import androidx.lifecycle.viewModelScope
+import com.buddhatutors.auth.EmailNotVerifiedException
 import com.buddhatutors.common.BaseViewModel
 import com.buddhatutors.common.UiEffect
 import com.buddhatutors.common.UiEvent
@@ -8,13 +9,15 @@ import com.buddhatutors.common.UiState
 import com.buddhatutors.domain.model.Resource
 import com.buddhatutors.domain.model.user.UserType.*
 import com.buddhatutors.domain.usecase.auth.LoginUser
+import com.buddhatutors.domain.usecase.auth.SendEmailVerification
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 internal class LoginViewModel @Inject constructor(
-    private val loginUser: LoginUser
+    private val loginUser: LoginUser,
+    private val sendEmailVerification: SendEmailVerification
 ) : BaseViewModel<LoginUiEvent, LoginUiState, LoginUiEffect>() {
 
     override fun createInitialState(): LoginUiState = LoginUiState()
@@ -43,8 +46,38 @@ internal class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             setState { copy(showLoader = true) }
             when (val resource = loginUser(currentState.email, currentState.password)) {
+
                 is Resource.Error -> {
-                    setEffect { LoginUiEffect.ShowErrorMessage(resource.throwable.message.orEmpty()) }
+                    if (resource.throwable is EmailNotVerifiedException) {
+                        setEffect {
+                            LoginUiEffect.ShowMessage(
+                                resource.throwable.message.orEmpty(),
+                                actionButtonLabel = "Send",
+                                actionButtonCallback = {
+                                    viewModelScope.launch {
+                                        when (val emailVerificationResource =
+                                            sendEmailVerification()) {
+                                            is Resource.Error -> {
+                                                setEffect {
+                                                    LoginUiEffect.ShowMessage(
+                                                        message = emailVerificationResource.throwable.message.orEmpty()
+                                                    )
+                                                }
+                                            }
+
+                                            is Resource.Success -> {
+                                                setEffect {
+                                                    LoginUiEffect.ShowMessage(message = "Verification email sent!")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            )
+                        }
+                    } else {
+                        setEffect { LoginUiEffect.ShowMessage(resource.throwable.message.orEmpty()) }
+                    }
                 }
 
                 is Resource.Success -> {
@@ -84,7 +117,12 @@ internal data class LoginUiState(
 
 internal sealed class LoginUiEffect : UiEffect {
 
-    data class ShowErrorMessage(val message: String) : LoginUiEffect()
+    data class ShowMessage(
+        val message: String,
+        val actionButtonLabel: String? = null,
+        val actionButtonCallback: (() -> Unit)? = null
+    ) : LoginUiEffect()
+
 
     data object NavigateToRegister : LoginUiEffect()
 
