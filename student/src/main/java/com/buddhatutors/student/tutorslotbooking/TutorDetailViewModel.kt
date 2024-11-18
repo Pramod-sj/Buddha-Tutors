@@ -20,7 +20,7 @@ import com.buddhatutors.domain.model.Topic
 import com.buddhatutors.domain.model.tutorlisting.TutorListing
 import com.buddhatutors.domain.model.tutorlisting.slotbooking.BookedSlot
 import com.buddhatutors.domain.usecase.AuthoriseGoogleCalendarAccessUseCase
-import com.buddhatutors.domain.usecase.admin.GetTutorListingByTutorId
+import com.buddhatutors.domain.usecase.GetBookedSlotByTutorId
 import com.buddhatutors.domain.usecase.student.BookTutorSlot
 import com.buddhatutors.student.tutorslotbooking.TutorDetailUiEvent.BookSlotButtonClick
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -52,7 +52,7 @@ data class SlotTimeUiModel(
 class TutorDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val bookTutorSlot: BookTutorSlot,
-    private val getTutorListingByTutorId: GetTutorListingByTutorId,
+    private val getBookedSlotByTutorId: GetBookedSlotByTutorId,
     private val authoriseGoogleCalendarAccessUseCase: AuthoriseGoogleCalendarAccessUseCase
 ) : BaseViewModel<TutorDetailUiEvent, TutorDetailUiState, TutorDetailUiEffect>() {
 
@@ -71,7 +71,8 @@ class TutorDetailViewModel @Inject constructor(
                 val timeSlots = currentState.tutorListing?.let { tutorListing ->
                     generateTimeSlots(
                         dateSlotUiModel = event.slotDateUiModel,
-                        tutorListing = tutorListing
+                        tutorListing = tutorListing,
+                        bookedSlotList = currentState.bookedSlotList
                     )
                 }.orEmpty()
 
@@ -141,6 +142,7 @@ class TutorDetailViewModel @Inject constructor(
             loggedInUser = student,
             tutor = tutor,
             bookedSlot = BookedSlot(
+                id = "",//unknown for now
                 date = currentState.selectedDateSlot?.dateString.orEmpty(),
                 startTime = currentState.selectedTimeSlot?.startTime.orEmpty(),
                 endTime = currentState.selectedTimeSlot?.endTime.orEmpty(),
@@ -148,7 +150,8 @@ class TutorDetailViewModel @Inject constructor(
                 bookedAtDateTime = DateUtils.convertTimeInMillisToSpecifiedDateString(
                     timeInMillis = Calendar.getInstance().timeInMillis
                 ),
-                topic = currentState.tutorListing?.expertiseIn?.firstOrNull()
+                topic = tutor.expertiseIn.firstOrNull(),
+                tutorId = tutor.tutorUser.id
             )
         )
         when (resource) {
@@ -163,7 +166,7 @@ class TutorDetailViewModel @Inject constructor(
 
                 setState { copy(selectedTimeSlot = null, selectedTopic = null) }
 
-                fetchTutorListing()
+                fetchTutorBookedSlots()
 
                 Log.i("TAG", "SUCCESS")
             }
@@ -212,12 +215,13 @@ class TutorDetailViewModel @Inject constructor(
 
     private fun generateTimeSlots(
         dateSlotUiModel: SlotDateUiModel,
-        tutorListing: TutorListing
+        tutorListing: TutorListing,
+        bookedSlotList: List<BookedSlot>
     ): List<SlotTimeUiModel> {
 
         return tutorListing.availableTimeSlots.map { slot ->
 
-            val isSlotBooked = tutorListing.bookedSlots.any {
+            val isSlotBooked = bookedSlotList.any {
                 it.date == dateSlotUiModel.dateString
                         && it.startTime == slot.start.orEmpty()
                         && it.endTime == slot.end.orEmpty()
@@ -233,15 +237,17 @@ class TutorDetailViewModel @Inject constructor(
         }
     }
 
-    private fun fetchTutorListing() {
+    private fun fetchTutorBookedSlots() {
         viewModelScope.launch {
 
             currentState.tutorListing?.tutorUser?.id?.let {
-                when (val resource = getTutorListingByTutorId(it)) {
+                when (val resource = getBookedSlotByTutorId(it)) {
                     is Resource.Error -> Unit
 
                     is Resource.Success -> {
-                        setState { copy(tutorListing = resource.data) }
+                        setState {
+                            copy(bookedSlotList = resource.data)
+                        }
                     }
                 }
             }
@@ -275,7 +281,8 @@ class TutorDetailViewModel @Inject constructor(
                                 tutorListing?.let { tutorListing ->
                                     generateTimeSlots(
                                         dateSlotUiModel = selectedDateSlot,
-                                        tutorListing = tutorListing
+                                        tutorListing = tutorListing,
+                                        bookedSlotList = currentState.bookedSlotList
                                     )
                                 }.orEmpty()
                             }.orEmpty()
@@ -293,13 +300,14 @@ class TutorDetailViewModel @Inject constructor(
             }.launchIn(this)
         }
 
-        //fetchTutorListing()
+        fetchTutorBookedSlots()
     }
 
 }
 
 data class TutorDetailUiState(
     val tutorListing: TutorListing? = null,
+    val bookedSlotList: List<BookedSlot> = emptyList(),
 
     val dateSlots: List<SlotDateUiModel> = emptyList(),
     val timeSlots: List<SlotTimeUiModel> = emptyList(),

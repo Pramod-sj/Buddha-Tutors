@@ -74,8 +74,6 @@ fun PreviewTutorDetailPage() {
                         TimeSlot("09:30 AM", "10:00 AM")
                     ),
                     verification = null,
-                    bookedSlots = listOf()
-
                 )
             ),
             uiEvent = {})

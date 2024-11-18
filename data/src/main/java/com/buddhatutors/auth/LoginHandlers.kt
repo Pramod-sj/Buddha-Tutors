@@ -30,9 +30,9 @@ class EmailPasswordLoginHandler @Inject constructor(
                     authLoginRequestPayload.email,
                     authLoginRequestPayload.password
                 ).addOnCompleteListener { result ->
-                    val user = result.result.user
-                    if (result.isSuccessful && user != null) {
-                        if (user.isEmailVerified) {
+                    if (result.isSuccessful) {
+                        val user = result.result.user
+                        if (user?.isEmailVerified == true) {
                             continuation.resume(AuthResultSuccess(result.result.user?.uid.orEmpty()))
                         } else {
                             continuation.resume(AuthResultFailure(EmailNotVerifiedException("Your email is not verified. Please verify your email to continue.")))

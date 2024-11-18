@@ -2,6 +2,7 @@ package com.buddhatutors.di
 
 import com.buddhatutors.data.FirebaseRemoteConfigManager
 import com.buddhatutors.data.datasourceimpl.AuthDataSourceImpl
+import com.buddhatutors.data.datasourceimpl.BookedSlotDataSourceImpl
 import com.buddhatutors.data.datasourceimpl.GoogleCalendarApiAuthorizeHandlerImpl
 import com.buddhatutors.data.datasourceimpl.GoogleSignInOAuthHandlerImpl
 import com.buddhatutors.data.datasourceimpl.MeetingDataSourceImpl
@@ -13,6 +14,7 @@ import com.buddhatutors.domain.GoogleScopeAuthorizeHandler
 import com.buddhatutors.domain.OAuthHandler
 import com.buddhatutors.domain.UserSessionDataSource
 import com.buddhatutors.domain.datasource.AuthDataSource
+import com.buddhatutors.domain.datasource.BookedSlotDataSource
 import com.buddhatutors.domain.datasource.MeetingDataSource
 import com.buddhatutors.domain.datasource.RemoteConfigSource
 import com.buddhatutors.domain.datasource.TopicDataSource
@@ -53,5 +55,8 @@ internal interface DataSourceModule {
 
     @Binds
     fun bindGoogleScopeAuthorizeHandler(googleCalendarApiAuthorizeHandlerImpl: GoogleCalendarApiAuthorizeHandlerImpl): GoogleScopeAuthorizeHandler
+
+    @Binds
+    fun bindBookedSlotDataSource(bookedSlotDataSourceImpl: BookedSlotDataSourceImpl): BookedSlotDataSource
 
 }

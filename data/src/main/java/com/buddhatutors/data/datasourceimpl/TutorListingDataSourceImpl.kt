@@ -196,31 +196,6 @@ class TutorListingDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun bookTutorSlot(tutorId: String, bookedSlot: BookedSlot): Resource<Unit> {
-        if (isSlotAlreadyBooked(tutorId = tutorId, bookedSlot = bookedSlot)) {
-            return Resource.Error(Throwable("Slot already booked!"))
-        }
-        return suspendCoroutine { continuation ->
-            tutorsDocumentReference
-                .document(tutorId)
-                .update(
-                    "bookedSlots",
-                    FieldValue.arrayUnion(bookedSlotEMapper.toEntity(bookedSlot))
-                )
-                .addOnCompleteListener {
-                    if (it.isSuccessful) {
-                        continuation.resume(Resource.Success(Unit))
-                    } else {
-                        continuation.resume(
-                            Resource.Error(
-                                it.exception ?: Throwable("Something went wrong!")
-                            )
-                        )
-                    }
-                }
-        }
-    }
-
     override suspend fun getAllTutorListing(): Resource<List<TutorListing>> {
         return suspendCoroutine { continuation ->
             tutorsDocumentReference
@@ -243,32 +218,4 @@ class TutorListingDataSourceImpl @Inject constructor(
         }
     }
 
-    private suspend fun isSlotAlreadyBooked(
-        tutorId: String, bookedSlot: BookedSlot
-    ): Boolean {
-        return suspendCoroutine { continuation ->
-            tutorsDocumentReference
-                .document(tutorId)
-                .get()
-                .addOnCompleteListener { result ->
-                    if (result.isSuccessful) {
-
-                        val tutor = result.result.toObject(TutorListingE::class.java)
-
-                        val isSlotAlreadyBooked = tutor?.bookedSlots?.any {
-                            it.date == bookedSlot.date &&
-                                    it.startTime == bookedSlot.startTime &&
-                                    it.endTime == bookedSlot.endTime
-                        } ?: false
-
-                        continuation.resume(isSlotAlreadyBooked)
-
-                    } else {
-
-                        continuation.resume(false)
-
-                    }
-                }
-        }
-    }
 }

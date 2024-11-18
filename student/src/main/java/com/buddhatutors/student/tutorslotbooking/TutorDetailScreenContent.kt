@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.buddhatutors.common.DynamicSelectTextField
+import com.buddhatutors.common.Navigator
 import com.buddhatutors.common.theme.BuddhaTutorTheme
 import com.buddhatutors.data.datasourceimpl.ActivityContextWrapper
 import com.buddhatutors.domain.model.Topic
@@ -84,8 +85,6 @@ fun PreviewTutorDetailPage() {
                         verifiedByUserId = "",
                         verifiedByUserName = "",
                         verifiedDateTime = ""
-                    ), bookedSlots = listOf(
-
                     ),
                     expertiseIn = listOf(
                         Topic("", "Story telling"),
@@ -107,6 +106,8 @@ fun PreviewTutorDetailPage() {
 fun TutorDetailScreen() {
 
     val context = LocalContext.current
+
+    val navigator = Navigator
 
     val viewModel = hiltViewModel<TutorDetailViewModel>()
 
@@ -160,7 +161,7 @@ fun TutorDetailScreen() {
                         imageVector = Icons.Filled.ArrowBack,
                         iconTint = Color.Black
                     ) {
-                        //      navigator.popBackStack()
+                              navigator.popBackStack()
                     }
                 })
         },

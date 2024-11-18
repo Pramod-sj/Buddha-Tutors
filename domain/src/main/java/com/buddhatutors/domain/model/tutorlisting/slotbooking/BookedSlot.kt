@@ -14,11 +14,13 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class BookedSlot(
+    val id: String,
     val date: String, // Format: "yyyy-MM-dd", e.g., "2024-11-08"
     val startTime: String, // Format: "HH:mm", e.g., "14:00"
     val endTime: String, // Format: "HH:mm", e.g., "15:30"
     val bookedByStudentId: String, // The ID of the student who booked the slot
     val bookedAtDateTime: String,
     val topic: Topic?,
-    val meetInfo: MeetInfo? = null
+    val meetInfo: MeetInfo? = null,
+    val tutorId: String
 )

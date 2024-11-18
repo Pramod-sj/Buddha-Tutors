@@ -49,7 +49,6 @@ class RegisterUser @Inject constructor(
                                 availableDays = availabilityDay,
                                 availableTimeSlots = timeSlots,
                                 verification = Verification(isApproved = false),
-                                bookedSlots = listOf(),
                             )
                         )
                         when (tutorListingResource) {

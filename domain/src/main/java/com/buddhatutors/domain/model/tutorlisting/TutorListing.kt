@@ -21,8 +21,7 @@ data class TutorListing(
     val expertiseIn: List<Topic> = emptyList(),
     val availableDays: List<String> = emptyList(),
     val availableTimeSlots: List<TimeSlot> = emptyList(),
-    val verification: Verification? = null,
-    val bookedSlots: List<BookedSlot> = emptyList(),
+    val verification: Verification? = null
 )
 
 

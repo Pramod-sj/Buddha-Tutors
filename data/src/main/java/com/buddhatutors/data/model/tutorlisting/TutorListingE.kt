@@ -1,7 +1,6 @@
 package com.buddhatutors.data.model.tutorlisting
 
 import com.buddhatutors.EntityMapper
-import com.buddhatutors.data.model.BookedSlotEMapper
 import com.buddhatutors.data.model.MeetInfoE
 import com.buddhatutors.data.model.TopicE
 import com.buddhatutors.data.model.TopicEMapper
@@ -17,8 +16,7 @@ data class TutorListingE(
     val expertiseIn: List<TopicE> = emptyList(),
     val availableDays: List<String> = emptyList(),
     val availableTimeSlots: List<TimeSlotE> = emptyList(),
-    val verification: VerificationE? = null,
-    val bookedSlots: List<BookedSlotE> = emptyList(),
+    val verification: VerificationE? = null
 )
 
 data class VerificationE(
@@ -29,13 +27,15 @@ data class VerificationE(
 )
 
 data class BookedSlotE(
+    val id: String = "",
     val date: String = "",
     val startTime: String = "",
     val endTime: String = "",
     val bookedByStudentId: String = "",
     val bookedAtDateTime: String = "",
     val topic: TopicE? = null,
-    val meetInfo: MeetInfoE? = null
+    val meetInfo: MeetInfoE? = null,
+    val tutorId: String = ""
 )
 
 data class TimeSlotE(
@@ -56,7 +56,6 @@ class TimeSlotEMapper @Inject constructor() : EntityMapper<TimeSlotE, TimeSlot> 
 
 class TutorListingEMapper @Inject constructor(
     private val userEMapper: UserEMapper,
-    private val bookedSlotEMapper: BookedSlotEMapper,
     private val verificationEMapper: VerificationEMapper,
     private val topicEMapper: TopicEMapper,
     private val timeSlotEMapper: TimeSlotEMapper
@@ -65,7 +64,6 @@ class TutorListingEMapper @Inject constructor(
     override fun toDomain(entity: TutorListingE): TutorListing {
         return TutorListing(
             verification = entity.verification?.let { verificationEMapper.toDomain(it) },
-            bookedSlots = entity.bookedSlots.map { bookedSlotEMapper.toDomain(it) },
             tutorUser = entity.tutorUser.let { userEMapper.toDomain(it) },
             expertiseIn = entity.expertiseIn.map { topicEMapper.toDomain(it) },
             availableDays = entity.availableDays,
@@ -80,7 +78,6 @@ class TutorListingEMapper @Inject constructor(
             availableDays = domain.availableDays,
             availableTimeSlots = domain.availableTimeSlots.map { timeSlotEMapper.toEntity(it) },
             verification = domain.verification?.let { verificationEMapper.toEntity(it) },
-            bookedSlots = domain.bookedSlots.map { bookedSlotEMapper.toEntity(it) }
         )
     }
 

@@ -25,10 +25,5 @@ interface TutorListingDataSource {
         isApproved: Boolean
     ): Resource<TutorListing>
 
-    suspend fun bookTutorSlot(
-        tutorId: String,
-        bookedSlot: BookedSlot,
-    ): Resource<Unit>
-
     suspend fun getAllTutorListing(): Resource<List<TutorListing>>
 }

@@ -3,8 +3,8 @@ package com.buddhatutors.domain.usecase.student
 import android.util.Log
 import com.buddhatutors.domain.KEY_CALENDAR_SCOPE_ACCESS_TOKEN
 import com.buddhatutors.domain.UserSessionDataSource
+import com.buddhatutors.domain.datasource.BookedSlotDataSource
 import com.buddhatutors.domain.datasource.MeetingDataSource
-import com.buddhatutors.domain.datasource.TutorListingDataSource
 import com.buddhatutors.domain.model.Resource
 import com.buddhatutors.domain.model.tutorlisting.TutorListing
 import com.buddhatutors.domain.model.tutorlisting.slotbooking.BookedSlot
@@ -13,7 +13,7 @@ import com.buddhatutors.domain.model.user.UserType
 import javax.inject.Inject
 
 class BookTutorSlot @Inject constructor(
-    private val tutorListingDataSource: TutorListingDataSource,
+    private val bookedSlotDataSource: BookedSlotDataSource,
     private val meetingDataSource: MeetingDataSource,
     private val userSessionDataSource: UserSessionDataSource
 ) {
@@ -22,7 +22,7 @@ class BookTutorSlot @Inject constructor(
         loggedInUser: User,
         tutor: TutorListing,
         bookedSlot: BookedSlot
-    ): Resource<Unit> {
+    ): Resource<BookedSlot> {
 
         if (loggedInUser.userType != UserType.STUDENT) {
             return Resource.Error(Throwable("Operation is not allowed by ${loggedInUser.userType}"))
@@ -45,15 +45,17 @@ class BookTutorSlot @Inject constructor(
             is Resource.Success -> {
                 val meetInfo = meetingResource.data
                 Log.i("MEET INFO", meetInfo.toString())
-                val resource = tutorListingDataSource.bookTutorSlot(
-                    tutorId = tutor.tutorUser.id,
+                val resource = bookedSlotDataSource.bookTutorSlot(
                     bookedSlot = bookedSlot.copy(meetInfo = meetInfo)
                 )
                 when (resource) {
-                    is Resource.Error -> meetingDataSource.cancelMeet(
-                        accessToken = accessToken,
-                        eventId = meetInfo.eventId
-                    )
+                    is Resource.Error -> {
+                        meetingDataSource.cancelMeet(
+                            accessToken = accessToken,
+                            eventId = meetInfo.eventId
+                        )
+                        resource
+                    }
 
                     is Resource.Success -> resource
                 }
