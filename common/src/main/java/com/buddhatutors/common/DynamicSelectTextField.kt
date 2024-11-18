@@ -54,10 +54,7 @@ fun DynamicSelectTextField(
                 .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
                 .fillMaxWidth(),
             shape = MaterialTheme.shapes.small,
-            colors = TextFieldDefaults.colors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            ),
+            colors = DefaultBuddhaTutorTextFieldColors,
         )
 
         ExposedDropdownMenu(
