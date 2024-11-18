@@ -2,6 +2,9 @@ package com.buddhatutors.common
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -64,3 +67,19 @@ fun ActionIconButton(
         )
     }
 }
+
+
+val DefaultBuddhaTutorTextFieldColors: TextFieldColors
+    @Composable get() = TextFieldDefaults.colors(
+        focusedIndicatorColor = Color.Transparent,
+        unfocusedIndicatorColor = Color.Transparent,
+        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest.copy(
+            0.5f
+        ),
+        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest.copy(
+            0.5f
+        ),
+        errorContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest.copy(
+            0.5f
+        ),
+    )

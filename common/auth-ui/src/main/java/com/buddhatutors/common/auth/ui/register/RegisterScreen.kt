@@ -88,6 +88,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.buddhatutors.common.ActionIconButton
+import com.buddhatutors.common.DefaultBuddhaTutorTextFieldColors
 import com.buddhatutors.common.Navigator
 import com.buddhatutors.common.auth.ui.termconditions.EXTRA_IS_ACCEPTED
 import com.buddhatutors.common.navigation.AuthGraph
@@ -305,10 +306,7 @@ internal fun RegisterScreenContent(
                 uiEvent(RegisterUiEvent.OnUserNameChanged(text))
             },
             shape = MaterialTheme.shapes.small,
-            colors = TextFieldDefaults.colors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            ),
+            colors = DefaultBuddhaTutorTextFieldColors,
             isError = uiState.validationResult?.isNameValid == false
         )
 
@@ -322,10 +320,7 @@ internal fun RegisterScreenContent(
                 uiEvent(RegisterUiEvent.OnEmailChanged(text))
             },
             shape = MaterialTheme.shapes.small,
-            colors = TextFieldDefaults.colors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            ),
+            colors = DefaultBuddhaTutorTextFieldColors,
             isError = uiState.validationResult?.isEmailValid == false
         )
 
@@ -340,10 +335,7 @@ internal fun RegisterScreenContent(
                 uiEvent(RegisterUiEvent.OnPasswordChanged(text))
             },
             shape = MaterialTheme.shapes.small,
-            colors = TextFieldDefaults.colors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            ),
+            colors = DefaultBuddhaTutorTextFieldColors,
             isError = uiState.validationResult?.isPasswordValid == false
         )
 
@@ -355,10 +347,7 @@ internal fun RegisterScreenContent(
                 uiEvent(RegisterUiEvent.OnConfirmPasswordChanged(text))
             },
             shape = MaterialTheme.shapes.small,
-            colors = TextFieldDefaults.colors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            ),
+            colors = DefaultBuddhaTutorTextFieldColors,
             label = {
                 Text("Confirm Password")
             },
@@ -399,92 +388,96 @@ internal fun RegisterScreenContent(
             }
         }
 
-        AnimatedVisibility(uiState.userType == UserType.TUTOR) {
+        Column {
 
-            Column(
-                Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
+            //wrap inside a column because there was a jump when view is hidden in AnimatedVisibility
 
-                Column(modifier = Modifier.fillMaxWidth()) {
+            AnimatedVisibility(uiState.userType == UserType.TUTOR) {
 
-                    if (uiState.topics.isNotEmpty()) {
+                Column(
+                    Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
 
-                        Spacer(Modifier.height(12.dp))
+                    Column(modifier = Modifier.fillMaxWidth()) {
+
+                        if (uiState.topics.isNotEmpty()) {
+
+                            Spacer(Modifier.height(6.dp))
+
+                            Text(
+                                text = "Expertise in ",
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.clickable { showTopicDialog = true }
+                            )
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            MultiSelectTextFieldDropdown(
+                                modifier = Modifier.fillMaxWidth(),
+                                selectedValues = uiState.selectedTopics.map { topic -> topic.label },
+                                options = uiState.topics.map { topic -> topic.label },
+                                label = "Select topics",
+                                onValueChangedEvent = { value ->
+                                    uiEvent(RegisterUiEvent.OnExpertiseTopicChanged(value))
+                                },
+                                dropDownHeightInDp = 200.dp
+                            )
+
+                        }
+
+                    }
+
+                    Column {
+
+                        Spacer(Modifier.height(8.dp))
 
                         Text(
-                            text = "Expertise in ",
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.clickable { showTopicDialog = true }
+                            "Please choose your availability",
+                            style = MaterialTheme.typography.titleMedium
                         )
 
                         Spacer(modifier = Modifier.height(12.dp))
 
                         MultiSelectTextFieldDropdown(
                             modifier = Modifier.fillMaxWidth(),
-                            selectedValues = uiState.selectedTopics.map { topic -> topic.label },
-                            options = uiState.topics.map { topic -> topic.label },
-                            label = "Select topics",
+                            selectedValues = uiState.selectedAvailabilityDay,
+                            options = uiState.days.map { it.second },
+                            label = "Select days",
                             onValueChangedEvent = { value ->
-                                uiEvent(RegisterUiEvent.OnExpertiseTopicChanged(value))
-                            },
-                            dropDownHeightInDp = 200.dp
+                                uiEvent(RegisterUiEvent.OnDayAvailabilityChanged(value))
+                            }
                         )
 
-                    }
+                        Spacer(modifier = Modifier.height(12.dp))
 
-                }
-
-                Column {
-
-                    Spacer(Modifier.height(8.dp))
-
-                    Text(
-                        "Please choose your availability",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    MultiSelectTextFieldDropdown(
-                        modifier = Modifier.fillMaxWidth(),
-                        selectedValues = uiState.selectedAvailabilityDay,
-                        options = uiState.days.map { it.second },
-                        label = "Select days",
-                        onValueChangedEvent = { value ->
-                            uiEvent(RegisterUiEvent.OnDayAvailabilityChanged(value))
-                        }
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    TextFieldChipHolder(
-                        label = "Select timeslots",
-                        selectedValues = uiState.selectedTimeSlots.map { "${it.start} - ${it.end}" },
-                        onClick = {
-                            uiEvent(RegisterUiEvent.UpdateTimePickerDialogVisibility(true))
-                        },
-                        onRemoveChipClick = {
-                            val timeSlotString = it.split("-").map { it.trim() }
-                            uiEvent(
-                                RegisterUiEvent.OnTimeSlotRemoved(
-                                    TimeSlot(
-                                        start = timeSlotString.getOrNull(0),
-                                        end = timeSlotString.getOrNull(1)
+                        TextFieldChipHolder(
+                            label = "Select timeslots",
+                            selectedValues = uiState.selectedTimeSlots.map { "${it.start} - ${it.end}" },
+                            onClick = {
+                                uiEvent(RegisterUiEvent.UpdateTimePickerDialogVisibility(true))
+                            },
+                            onRemoveChipClick = {
+                                val timeSlotString = it.split("-").map { it.trim() }
+                                uiEvent(
+                                    RegisterUiEvent.OnTimeSlotRemoved(
+                                        TimeSlot(
+                                            start = timeSlotString.getOrNull(0),
+                                            end = timeSlotString.getOrNull(1)
+                                        )
                                     )
                                 )
-                            )
-                        },
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(
-                                modifier = Modifier.align(Alignment.CenterEnd),
-                                expanded = uiState.isTimepickerDialogVisible
-                            )
-                        }
-                    )
+                            },
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(
+                                    modifier = Modifier.align(Alignment.CenterEnd),
+                                    expanded = uiState.isTimepickerDialogVisible
+                                )
+                            }
+                        )
 
 
-                    /* AvailabilityCalendarChooser(
+                        /* AvailabilityCalendarChooser(
                      selectedDays = uiState.selectedAvailabilityDay,
                      selectedTimeSlot = uiState.selectedTimeSlot,
                      onDaysSelectionChangeEvent = { days ->
@@ -494,35 +487,39 @@ internal fun RegisterScreenContent(
                          uiEvent(RegisterUiEvent.OnTimeAvailabilityChanged(timeSlot))
                      }
                  )*/
-                }
+                    }
 
+                    Spacer(Modifier.height(16.dp))
+
+                }
             }
-        }
 
 
-        Row(modifier = Modifier.clickable {
-            uiEvent(RegisterUiEvent.OnTermsAndConditionsClick)
-        }) {
-            Checkbox(checked = uiState.isTermConditionAccepted,
-                onCheckedChange = {
-                    uiEvent(RegisterUiEvent.OnTermsAndConditionsClick)
-                })
-            Text(
-                buildAnnotatedString {
-                    val span = "Terms & Conditions"
-                    val str =
-                        "By proceeding with registration, you agree to our Terms & Conditions."
-                    val startIndex = str.indexOf(span)
-                    val endIndex = startIndex + span.length
-                    append(str)
-                    addStyle(
-                        style = SpanStyle(
-                            color = Color.Blue,
-                            textDecoration = TextDecoration.Underline
-                        ), start = startIndex, end = endIndex
-                    )
-                }
-            )
+            Row(modifier = Modifier.clickable {
+                uiEvent(RegisterUiEvent.OnTermsAndConditionsClick)
+            }) {
+                Checkbox(checked = uiState.isTermConditionAccepted,
+                    onCheckedChange = {
+                        uiEvent(RegisterUiEvent.OnTermsAndConditionsClick)
+                    })
+                Text(
+                    buildAnnotatedString {
+                        val span = "Terms & Conditions"
+                        val str =
+                            "By proceeding with registration, you agree to our Terms & Conditions."
+                        val startIndex = str.indexOf(span)
+                        val endIndex = startIndex + span.length
+                        append(str)
+                        addStyle(
+                            style = SpanStyle(
+                                color = Color.Blue,
+                                textDecoration = TextDecoration.Underline
+                            ), start = startIndex, end = endIndex
+                        )
+                    }
+                )
+            }
+
         }
 
     }
@@ -554,7 +551,7 @@ fun MultiSelectTextFieldDropdown(
         Box(
             modifier = Modifier
                 .background(
-                    color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(0.5f),
                     shape = MaterialTheme.shapes.small
                 )
                 .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
@@ -658,7 +655,7 @@ private fun TextFieldChipHolder(
     Box(
         modifier = Modifier
             .background(
-                color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(0.5f),
                 shape = MaterialTheme.shapes.small
             )
             .clip(shape = MaterialTheme.shapes.small)

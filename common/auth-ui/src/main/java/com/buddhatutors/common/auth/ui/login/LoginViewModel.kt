@@ -9,15 +9,20 @@ import com.buddhatutors.common.UiState
 import com.buddhatutors.domain.model.Resource
 import com.buddhatutors.domain.model.user.UserType.*
 import com.buddhatutors.domain.usecase.auth.LoginUser
+import com.buddhatutors.domain.usecase.auth.LoginValidationResult
 import com.buddhatutors.domain.usecase.auth.SendEmailVerification
+import com.buddhatutors.domain.usecase.auth.ValidateLoginDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 internal class LoginViewModel @Inject constructor(
     private val loginUser: LoginUser,
-    private val sendEmailVerification: SendEmailVerification
+    private val sendEmailVerification: SendEmailVerification,
+    private val validateLoginDataUseCase: ValidateLoginDataUseCase
 ) : BaseViewModel<LoginUiEvent, LoginUiState, LoginUiEffect>() {
 
     override fun createInitialState(): LoginUiState = LoginUiState()
@@ -45,7 +50,8 @@ internal class LoginViewModel @Inject constructor(
     private fun loginUser() {
         viewModelScope.launch {
             setState { copy(showLoader = true) }
-            when (val resource = loginUser(currentState.email, currentState.password)) {
+            when (val resource =
+                loginUser(currentState.email.orEmpty(), currentState.password.orEmpty())) {
 
                 is Resource.Error -> {
                     if (resource.throwable is EmailNotVerifiedException) {
@@ -94,6 +100,18 @@ internal class LoginViewModel @Inject constructor(
         }
     }
 
+    init {
+        viewModelScope.launch {
+            combine(uiState.map { it.email },
+                uiState.map { it.password }) { email, pass ->
+                email to pass
+            }.collect { pair ->
+                val (email, pass) = pair
+                val loginResult = validateLoginDataUseCase(email, pass)
+                setState { copy(validateLoginDataResult = loginResult) }
+            }
+        }
+    }
 }
 
 
@@ -103,16 +121,20 @@ internal sealed class LoginUiEvent : UiEvent {
 
     data object OnRegisterClick : LoginUiEvent()
 
-    data class OnEmailChanged(val email: String) : LoginUiEvent()
+    data class OnEmailChanged(val email: String?) : LoginUiEvent()
 
-    data class OnPasswordChanged(val password: String) : LoginUiEvent()
+    data class OnPasswordChanged(val password: String?) : LoginUiEvent()
 
 }
 
 internal data class LoginUiState(
-    val email: String = "",
-    val password: String = "",
-    val showLoader: Boolean = false
+    val email: String? = null,
+    val password: String? = null,
+    val showLoader: Boolean = false,
+    val validateLoginDataResult: LoginValidationResult = LoginValidationResult(
+        null,
+        null
+    )
 ) : UiState
 
 internal sealed class LoginUiEffect : UiEffect {
