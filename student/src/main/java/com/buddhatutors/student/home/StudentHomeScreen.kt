@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -30,9 +31,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.buddhatutors.common.ActionIconButton
 import com.buddhatutors.common.Navigator
@@ -88,8 +91,8 @@ internal fun StudentHomeScreenContent(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "BuddhaTutors",
-                        style = MaterialTheme.typography.titleLarge
+                        text = "Home",
+                        style = MaterialTheme.typography.titleSmall
                     )
                 },
                 actions = {
@@ -112,6 +115,19 @@ internal fun StudentHomeScreenContent(
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
+
+                item {
+                    Text(
+                        text = "Find the teacher who will help you excel",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.ExtraBold,
+                            letterSpacing = 1.sp
+                        )
+                    )
+                }
+
+                item { Spacer(Modifier) }
+
                 items(uiState.tutorListing) { tutorListing ->
                     TutorItemCard(
                         tutorListing = tutorListing,
@@ -161,7 +177,7 @@ fun TutorItemCard(
                 )
 
                 Text(
-                    text = "I'm a pass out willing to teach student who are super interested in getting the knowlege of ...",
+                    text = tutorListing.expertiseIn.map { it.label }.joinToString(" ") { "• $it" },
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis

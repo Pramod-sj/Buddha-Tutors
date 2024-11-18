@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -74,14 +75,15 @@ fun TutorItemCard(
             )
 
             Box(
-                Modifier
+                modifier = Modifier
                     .size(80.dp)
                     .padding(8.dp)
                     .background(
                         color = Color.Black.copy(alpha = 0.1f),
-                        shape = MaterialTheme.shapes.medium
+                        shape = CircleShape
                     )
             )
+
 
             Column(
                 modifier = Modifier
@@ -95,11 +97,14 @@ fun TutorItemCard(
                 )
 
                 Text(
-                    text = "I'm a pass out willing to teach student who are super interested in getting the knowlege of ...",
+                    text = "Expertise in ${
+                        tutorListing.expertiseIn.take(3).map { it.label }.joinToString { it }
+                    }",
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
+
 
             }
 
