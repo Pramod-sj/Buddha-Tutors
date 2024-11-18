@@ -1,8 +1,13 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@file:OptIn(
+    ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class,
+    ExperimentalComposeUiApi::class
+)
 
 package com.buddhatutors.common.auth.ui.register
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -45,12 +50,16 @@ import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.Typography
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -63,10 +72,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -138,22 +149,28 @@ fun RegisterScreen() {
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            MediumTopAppBar(
-                scrollBehavior = scrollBehavior,
-                title = {
-                    Text(
-                        text = "Create your account",
-                        style = MaterialTheme.typography.headlineMedium
-                    )
-                },
-                navigationIcon = {
-                    ActionIconButton(
-                        imageVector = Icons.Filled.ArrowBack,
-                        iconTint = Color.Black
-                    ) {
-                        navigator.popBackStack()
-                    }
-                })
+            MaterialTheme(
+                typography = Typography(
+                    titleLarge = MaterialTheme.typography.titleLarge,
+                    headlineSmall = MaterialTheme.typography.headlineMedium,
+                )
+            ) {
+                MediumTopAppBar(
+                    scrollBehavior = scrollBehavior,
+                    title = {
+                        Text(
+                            text = "Create your account"
+                        )
+                    },
+                    navigationIcon = {
+                        ActionIconButton(
+                            imageVector = Icons.Filled.ArrowBack,
+                            iconTint = Color.Black
+                        ) {
+                            navigator.popBackStack()
+                        }
+                    })
+            }
         },
         snackbarHost = {
             SnackbarHost(hostState = snackBarHostState)
@@ -221,7 +238,14 @@ fun RegisterScreen() {
     }
 
     if (uiState.isTimepickerDialogVisible) {
+
+        val modalBottomSheetState = rememberModalBottomSheetState(
+            skipPartiallyExpanded = true
+        )
+
         ModalBottomSheet(
+            sheetState = modalBottomSheetState,
+            dragHandle = null,
             onDismissRequest = {
                 viewModel.setEvent(RegisterUiEvent.UpdateTimePickerDialogVisibility(false))
             },
@@ -236,14 +260,21 @@ fun RegisterScreen() {
                 selectedEndTime = null,
                 onTimeSlotSelected = { startTime, endTime ->
 
-                    viewModel.setEvent(
-                        RegisterUiEvent.OnTimeSlotAdded(
-                            TimeSlot(
-                                start = startTime,
-                                end = endTime
+                    coroutineScope.launch {
+
+                        viewModel.setEvent(
+                            RegisterUiEvent.OnTimeSlotAdded(
+                                TimeSlot(
+                                    start = startTime,
+                                    end = endTime
+                                )
                             )
                         )
-                    )
+
+                        modalBottomSheetState.hide()
+
+                        viewModel.setEvent(RegisterUiEvent.UpdateTimePickerDialogVisibility(false))
+                    }
                 }
             )
         }

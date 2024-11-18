@@ -73,6 +73,7 @@ dependencies {
     implementation(libs.navigation.hilt)
     implementation(libs.firebase.config.ktx)
     implementation(project(":student"))
+    implementation(project(":common:profile-ui"))
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -30,6 +30,10 @@ enum class UserType(val id: Int, val value: String) {
 
 }
 
+fun Int.toUserType(): UserType? {
+    return UserType.entries.find { it.id == this }
+}
+
 @Serializable
 data class User(
 

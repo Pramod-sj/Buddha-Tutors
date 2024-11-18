@@ -24,22 +24,13 @@ internal class StudentHomeViewModel @Inject constructor(
 
     override fun handleEvent(event: StudentHomeUiEvent) {
         when (event) {
-            StudentHomeUiEvent.Logout -> {
-                viewModelScope.launch {
-                    when (logoutUser()) {
-                        is Resource.Error -> {
-
-                        }
-
-                        is Resource.Success -> {
-                            setEffect { StudentHomeUiEffect.LoggedOutSuccess }
-                        }
-                    }
-                }
-            }
 
             is StudentHomeUiEvent.TutorListingItemClick -> {
                 setEffect { StudentHomeUiEffect.NavigateToTutorListingScreen(event.tutorListing) }
+            }
+
+            StudentHomeUiEvent.ProfileIconClick -> {
+                setEffect { StudentHomeUiEffect.NavigateToProfileScreen }
             }
         }
     }
@@ -68,13 +59,15 @@ internal sealed class StudentHomeUiEvent : UiEvent {
 
     data class TutorListingItemClick(val tutorListing: TutorListing) : StudentHomeUiEvent()
 
-    data object Logout : StudentHomeUiEvent()
+    data object ProfileIconClick : StudentHomeUiEvent()
 
 }
 
 internal sealed class StudentHomeUiEffect : UiEffect {
 
     data class NavigateToTutorListingScreen(val tutorListing: TutorListing) : StudentHomeUiEffect()
+
+    data object NavigateToProfileScreen : StudentHomeUiEffect()
 
     data object LoggedOutSuccess : StudentHomeUiEffect()
 

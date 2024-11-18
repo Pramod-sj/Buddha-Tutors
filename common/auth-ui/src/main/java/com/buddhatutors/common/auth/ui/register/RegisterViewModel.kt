@@ -64,7 +64,6 @@ internal class RegisterViewModel @Inject constructor(
                 setState {
                     copy(
                         selectedTimeSlots = newList.toMutableSet().toList(),
-                        isTimepickerDialogVisible = false
                     )
                 }
             }

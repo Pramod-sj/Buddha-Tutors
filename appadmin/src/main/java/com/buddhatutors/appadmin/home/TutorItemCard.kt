@@ -4,9 +4,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -40,16 +44,34 @@ fun PreviewTutorItemCard() {
 
 @Composable
 fun TutorItemCard(
-    tutor: TutorListing,
+    tutorListing: TutorListing,
     onClick: () -> Unit = {}
 ) {
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(90.dp),
         onClick = onClick
     ) {
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Box(
+                Modifier
+                    .width(6.dp)
+                    .fillMaxHeight()
+                    .then(
+                        if (tutorListing.verification?.isApproved == true) {
+                            Modifier.background(Color(0xFF32A72C))
+                        } else {
+                            Modifier.background(Color(0xFFDF6817))
+                        }
+                    )
+            )
 
             Box(
                 Modifier
@@ -68,7 +90,7 @@ fun TutorItemCard(
             ) {
 
                 Text(
-                    text = tutor.tutorUser.name,
+                    text = tutorListing.tutorUser.name,
                     style = MaterialTheme.typography.titleMedium
                 )
 
@@ -81,8 +103,8 @@ fun TutorItemCard(
 
             }
 
-
         }
+
 
     }
 

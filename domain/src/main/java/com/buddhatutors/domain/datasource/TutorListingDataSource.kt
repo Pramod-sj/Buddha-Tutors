@@ -29,4 +29,6 @@ interface TutorListingDataSource {
         tutorId: String,
         bookedSlot: BookedSlot,
     ): Resource<Unit>
+
+    suspend fun getAllTutorListing(): Resource<List<TutorListing>>
 }

@@ -62,3 +62,12 @@ object TutorGraph {
     object Home
 
 }
+
+
+@Serializable
+object ProfileGraph {
+
+    @Serializable
+    object Home
+
+}

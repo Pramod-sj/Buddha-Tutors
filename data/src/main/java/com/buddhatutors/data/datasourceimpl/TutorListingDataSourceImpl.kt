@@ -221,6 +221,28 @@ class TutorListingDataSourceImpl @Inject constructor(
         }
     }
 
+    override suspend fun getAllTutorListing(): Resource<List<TutorListing>> {
+        return suspendCoroutine { continuation ->
+            tutorsDocumentReference
+                .get()
+                .addOnCompleteListener { result ->
+                    if (result.isSuccessful) {
+                        val value = result.result
+                        val tutorListing = if (value?.isEmpty == false) {
+                            value.toObjects(TutorListingE::class.java).mapNotNull {
+                                tutorListingEMapper.toDomain(it)
+                            }
+                        } else emptyList()
+                        continuation.resume(Resource.Success(tutorListing))
+                    } else {
+                        continuation.resume(
+                            Resource.Error(result.exception ?: Exception(""))
+                        )
+                    }
+                }
+        }
+    }
+
     private suspend fun isSlotAlreadyBooked(
         tutorId: String, bookedSlot: BookedSlot
     ): Boolean {

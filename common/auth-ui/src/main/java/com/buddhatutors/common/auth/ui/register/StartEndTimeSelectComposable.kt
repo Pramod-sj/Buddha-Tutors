@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalComposeUiApi::class)
+
 package com.buddhatutors.common.auth.ui.register
 
 import androidx.compose.foundation.background
@@ -20,7 +22,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -77,7 +81,7 @@ fun StartEndTimeSelectComposable(
         Text(
             modifier = Modifier.padding(16.dp),
             text = "Choose timeslot",
-            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Medium)
         )
 
         Row(

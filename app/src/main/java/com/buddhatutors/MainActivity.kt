@@ -17,9 +17,11 @@ import com.buddhatutors.common.auth.ui.termconditions.TermConditionScreen
 import com.buddhatutors.common.navComposable
 import com.buddhatutors.common.navigation.AdminGraph
 import com.buddhatutors.common.navigation.AuthGraph
+import com.buddhatutors.common.navigation.ProfileGraph
 import com.buddhatutors.common.navigation.Splash
 import com.buddhatutors.common.navigation.StudentGraph
 import com.buddhatutors.common.navigation.navigationCustomArgument
+import com.buddhatutors.common.profile_ui.ProfileScreen
 import com.buddhatutors.common.theme.BuddhaTutorTheme
 import com.buddhatutors.domain.CurrentUser
 import com.buddhatutors.domain.UserSessionDataSource
@@ -93,6 +95,12 @@ class MainActivity : ComponentActivity() {
                             navComposable<StudentGraph.TutorDetail>(
                                 typeMap = mapOf(navigationCustomArgument<TutorListing>())
                             ) { TutorDetailScreen() }
+
+                        }
+
+                        navigation<ProfileGraph>(startDestination = ProfileGraph.Home) {
+
+                            navComposable<ProfileGraph.Home> { ProfileScreen() }
 
                         }
 

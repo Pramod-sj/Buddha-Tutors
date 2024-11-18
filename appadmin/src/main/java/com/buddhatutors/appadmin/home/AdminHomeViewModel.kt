@@ -7,7 +7,7 @@ import com.buddhatutors.common.UiEvent
 import com.buddhatutors.common.UiState
 import com.buddhatutors.domain.model.Resource
 import com.buddhatutors.domain.model.tutorlisting.TutorListing
-import com.buddhatutors.domain.usecase.admin.GetAllUnverifiedTutorUsers
+import com.buddhatutors.domain.usecase.admin.GetAllTutorUsers
 import com.buddhatutors.domain.usecase.auth.LogoutUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -17,13 +17,13 @@ import javax.inject.Inject
 @HiltViewModel
 internal class AdminHomeViewModel @Inject constructor(
     private val logoutUser: LogoutUser,
-    private val getAllUnverifiedTutorUsers: GetAllUnverifiedTutorUsers
+    private val getAllTutorUsers: GetAllTutorUsers
 ) : BaseViewModel<AdminHomeUiEvent, AdminHomeUiState, AdminHomeUiEffect>() {
 
 
     init {
         viewModelScope.launch {
-            when (val resource = getAllUnverifiedTutorUsers()) {
+            when (val resource = getAllTutorUsers()) {
                 is Resource.Error -> {
                     //handle error state
                 }
@@ -56,6 +56,14 @@ internal class AdminHomeViewModel @Inject constructor(
             is AdminHomeUiEvent.TutorCardClick -> {
                 setEffect { AdminHomeUiEffect.NavigateToTutorVerificationScreen(event.tutor) }
             }
+
+            AdminHomeUiEvent.LogoutClick -> {
+                setEffect { AdminHomeUiEffect.NavigateToProfileScreen }
+            }
+
+            AdminHomeUiEvent.ProfileIconClick -> {
+                setEffect { AdminHomeUiEffect.NavigateToProfileScreen }
+            }
         }
     }
 
@@ -72,6 +80,10 @@ internal sealed class AdminHomeUiEvent : UiEvent {
 
     data class TutorCardClick(val tutor: TutorListing) : AdminHomeUiEvent()
 
+    data object LogoutClick : AdminHomeUiEvent()
+
+    data object ProfileIconClick : AdminHomeUiEvent()
+
 }
 
 internal sealed class AdminHomeUiEffect : UiEffect {
@@ -79,5 +91,7 @@ internal sealed class AdminHomeUiEffect : UiEffect {
     data object LoggedOutSuccess : AdminHomeUiEffect()
 
     data class NavigateToTutorVerificationScreen(val tutor: TutorListing) : AdminHomeUiEffect()
+
+    data object NavigateToProfileScreen : AdminHomeUiEffect()
 
 }

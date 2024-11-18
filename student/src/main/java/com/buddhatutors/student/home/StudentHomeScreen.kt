@@ -16,7 +16,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,13 +36,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.buddhatutors.common.ActionIconButton
 import com.buddhatutors.common.Navigator
+import com.buddhatutors.common.navigation.ProfileGraph
 import com.buddhatutors.common.navigation.StudentGraph
 import com.buddhatutors.domain.model.tutorlisting.TutorListing
 
 @Preview
 @Composable
 internal fun PreviewHomePage() {
-    StudentHomeScreen()
+    StudentHomeScreenContent(uiState = StudentHomeUiState(tutorListing = listOf()), uiEvent = {})
 }
 
 
@@ -68,6 +69,10 @@ fun StudentHomeScreen() {
                 is StudentHomeUiEffect.NavigateToTutorListingScreen -> {
                     navigator.navigate(StudentGraph.TutorDetail(effect.tutorListing))
                 }
+
+                StudentHomeUiEffect.NavigateToProfileScreen -> {
+                    navigator.navigate(ProfileGraph.Home)
+                }
             }
         }
     }
@@ -89,10 +94,11 @@ internal fun StudentHomeScreenContent(
                 },
                 actions = {
                     ActionIconButton(
-                        imageVector = Icons.Default.ExitToApp,
+                        modifier = Modifier,
+                        imageVector = Icons.Outlined.Person,
                         iconTint = Color.Black
                     ) {
-                        //viewModel.setEvent(HomeViewModelUiEvent.Logout)
+                        uiEvent(StudentHomeUiEvent.ProfileIconClick)
                     }
                 })
         },
@@ -160,12 +166,7 @@ fun TutorItemCard(
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
-
             }
-
-
         }
-
     }
-
 }
