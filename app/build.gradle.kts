@@ -72,8 +72,6 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.navigation.hilt)
     implementation(libs.firebase.config.ktx)
-    implementation(project(":student"))
-    implementation(project(":common:profile-ui"))
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -103,11 +101,10 @@ dependencies {
     ksp(libs.moshi.kotlin.codegen)
 
     implementation(project(":common"))
-    implementation(project(":common:auth-ui"))
     implementation(project(":common:navigation"))
-    implementation(project(":data"))
-    implementation(project(":domain"))
-
-
-    implementation(project(":appadmin"))
+    implementation(project(":common:domain"))
+    implementation(project(":auth"))
+    implementation(project(":admin"))
+    implementation(project(":user"))
+    implementation(project(":user-profile"))
 }

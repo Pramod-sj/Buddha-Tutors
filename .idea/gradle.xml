@@ -10,16 +10,16 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/admin" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/appadmin" />
+            <option value="$PROJECT_DIR$/auth" />
             <option value="$PROJECT_DIR$/common" />
-            <option value="$PROJECT_DIR$/common/auth-ui" />
+            <option value="$PROJECT_DIR$/common/data" />
+            <option value="$PROJECT_DIR$/common/domain" />
             <option value="$PROJECT_DIR$/common/navigation" />
-            <option value="$PROJECT_DIR$/common/profile-ui" />
             <option value="$PROJECT_DIR$/common/utils" />
-            <option value="$PROJECT_DIR$/data" />
-            <option value="$PROJECT_DIR$/domain" />
-            <option value="$PROJECT_DIR$/student" />
+            <option value="$PROJECT_DIR$/user" />
+            <option value="$PROJECT_DIR$/user-profile" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />

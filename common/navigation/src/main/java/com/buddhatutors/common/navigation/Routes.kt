@@ -1,6 +1,7 @@
 package com.buddhatutors.common.navigation
 
-import com.buddhatutors.domain.model.tutorlisting.TutorListing
+import com.buddhatutors.common.domain.model.tutorlisting.TutorListing
+import com.buddhatutors.common.domain.model.tutorlisting.slotbooking.BookedSlot
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -17,6 +18,9 @@ object AuthGraph {
     object RegisterUser
 
     @Serializable
+    object ForgotPassword
+
+    @Serializable
     object TermAndConditions
 
 }
@@ -29,7 +33,19 @@ object AdminGraph {
     object Home
 
     @Serializable
+    object AddTutor
+
+    @Serializable
+    object AddMasterTutorUser
+
+    @Serializable
     data class AdminTutorVerification(val tutor: TutorListing)
+
+    @Serializable
+    object ManageTopic
+
+    @Serializable
+    object AddTopic
 
 }
 
@@ -38,8 +54,13 @@ object AdminGraph {
 object MasterTutorGraph {
 
     @Serializable
-    object Home
+    object MasterTutorHome
 
+    @Serializable
+    data class AdminTutorVerification(val tutor: TutorListing)
+
+    @Serializable
+    object AddMasterTutorUser
 }
 
 
@@ -47,7 +68,10 @@ object MasterTutorGraph {
 object StudentGraph {
 
     @Serializable
-    object Home
+    object Main
+
+    @Serializable
+    object TutorFilter
 
     @Serializable
     data class TutorDetail(val tutorListing: TutorListing)
@@ -60,6 +84,10 @@ object TutorGraph {
 
     @Serializable
     object Home
+
+    @Serializable
+    data class BookedSlotDetail(val bookedSlot: BookedSlot)
+
 
 }
 

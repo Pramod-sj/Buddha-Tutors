@@ -16,6 +16,7 @@ import androidx.navigation.navOptions
 import com.buddhatutors.common.Navigator
 import com.buddhatutors.common.navigation.AdminGraph
 import com.buddhatutors.common.navigation.AuthGraph
+import com.buddhatutors.common.navigation.MasterTutorGraph
 import com.buddhatutors.common.navigation.Splash
 import com.buddhatutors.common.navigation.StudentGraph
 import com.buddhatutors.common.navigation.TutorGraph
@@ -68,7 +69,10 @@ fun SplashScreen() {
                 }
 
                 SplashViewModelUiEffect.NavigateToMasterTutorFlow -> {
-
+                    navigator.navigate(
+                        route = MasterTutorGraph,
+                        navOptions = navOptions { popUpTo(Splash) { inclusive = true } }
+                    )
                 }
             }
         }

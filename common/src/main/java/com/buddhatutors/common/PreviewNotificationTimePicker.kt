@@ -400,6 +400,14 @@ fun VerticalWheelSpinner(
 
     var previousPage by remember { mutableIntStateOf(pagerState.currentPage) }
 
+    // Listen to defaultSelected changes
+    LaunchedEffect(defaultSelected) {
+        val newPage = items.indexOf(defaultSelected).takeIf { it != -1 } ?: 0
+        if (newPage != pagerState.currentPage) {
+            pagerState.animateScrollToPage(newPage)
+        }
+    }
+
     VerticalPager(
         modifier = modifier.height(height),
         horizontalAlignment = Alignment.CenterHorizontally,

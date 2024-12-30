@@ -1,35 +1,48 @@
 package com.buddhatutors
 
 import android.os.Bundle
+import android.view.MotionEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import com.buddhatutors.appadmin.home.AdminHomeScreen
-import com.buddhatutors.appadmin.tutorverification.TutorVerificationScreen
+import com.buddhatutors.appadmin.presentation.admin.AdminMainScreen
+import com.buddhatutors.appadmin.presentation.admin.addmastertutor.AddMasterTutorUserScreen
+import com.buddhatutors.appadmin.presentation.admin.topics.addtopics.AddTopicScreen
+import com.buddhatutors.appadmin.presentation.common.tutorverification.TutorVerificationScreen
+import com.buddhatutors.appadmin.presentation.common.addtutor.AddTutorUserScreen
+import com.buddhatutors.appadmin.presentation.master_tutor.home.MasterTutorHomeScreen
+import com.buddhatutors.auth.domain.datasource.UserSessionDataSource
+import com.buddhatutors.auth.presentation.forgotpassword.ForgotPasswordScreen
+import com.buddhatutors.auth.presentation.login.LoginScreen
+import com.buddhatutors.auth.presentation.register.RegisterScreen
+import com.buddhatutors.auth.presentation.termconditions.TermConditionScreen
 import com.buddhatutors.common.BuddhaTutorsProvider
-import com.buddhatutors.common.auth.ui.login.LoginScreen
-import com.buddhatutors.common.auth.ui.register.RegisterScreen
-import com.buddhatutors.common.auth.ui.termconditions.TermConditionScreen
+import com.buddhatutors.common.domain.CurrentUser
+import com.buddhatutors.common.domain.model.tutorlisting.TutorListing
 import com.buddhatutors.common.navComposable
+import com.buddhatutors.common.navDialogComposable
 import com.buddhatutors.common.navigation.AdminGraph
 import com.buddhatutors.common.navigation.AuthGraph
+import com.buddhatutors.common.navigation.MasterTutorGraph
 import com.buddhatutors.common.navigation.ProfileGraph
 import com.buddhatutors.common.navigation.Splash
 import com.buddhatutors.common.navigation.StudentGraph
+import com.buddhatutors.common.navigation.TutorGraph
 import com.buddhatutors.common.navigation.navigationCustomArgument
-import com.buddhatutors.common.profile_ui.ProfileScreen
 import com.buddhatutors.common.theme.BuddhaTutorTheme
-import com.buddhatutors.domain.CurrentUser
-import com.buddhatutors.domain.UserSessionDataSource
-import com.buddhatutors.domain.model.tutorlisting.TutorListing
-import com.buddhatutors.student.home.StudentHomeScreen
-import com.buddhatutors.student.tutorslotbooking.TutorDetailScreen
 import com.buddhatutors.ui.splash.SplashScreen
+import com.buddhatutors.user.presentation.student.main.StudentMainPage
+import com.buddhatutors.user.presentation.student.tutorslotbooking.TutorDetailScreen
+import com.buddhatutors.userprofile.ProfileScreen
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -38,6 +51,10 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var userSessionDataSource: UserSessionDataSource
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        return super.dispatchTouchEvent(ev)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +66,13 @@ class MainActivity : ComponentActivity() {
             ),
         )
 
-        CurrentUser.initialize(userSessionDataSource)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                userSessionDataSource.getUserSession().collect { user ->
+                    CurrentUser.setUser(user)
+                }
+            }
+        }
 
         setContent {
 
@@ -70,31 +93,58 @@ class MainActivity : ComponentActivity() {
 
                             navComposable<AuthGraph.LoginUser> { LoginScreen() }
 
+                            navDialogComposable<AuthGraph.ForgotPassword> { ForgotPasswordScreen() }
+
                             navComposable<AuthGraph.RegisterUser> { RegisterScreen() }
 
                             navComposable<AuthGraph.TermAndConditions> { TermConditionScreen() }
+
 
                         }
 
 
                         navigation<AdminGraph>(startDestination = AdminGraph.Home) {
 
-                            navComposable<AdminGraph.Home> { AdminHomeScreen() }
+                            navComposable<AdminGraph.Home> { AdminMainScreen() }
+
+                            navComposable<AdminGraph.AddTutor> { AddTutorUserScreen() }
+
+                            navComposable<AdminGraph.AddMasterTutorUser> { AddMasterTutorUserScreen() }
 
                             navComposable<AdminGraph.AdminTutorVerification>(
+                                typeMap = mapOf(navigationCustomArgument<TutorListing>())
+                            ) { TutorVerificationScreen() }
+
+                            navDialogComposable<AdminGraph.AddTopic> { AddTopicScreen() }
+
+                        }
+
+                        navigation<MasterTutorGraph>(startDestination = MasterTutorGraph.MasterTutorHome) {
+
+                            navComposable<MasterTutorGraph.MasterTutorHome> { MasterTutorHomeScreen() }
+
+                            navComposable<MasterTutorGraph.AddMasterTutorUser> { AddTutorUserScreen() }
+
+                            navComposable<MasterTutorGraph.AdminTutorVerification>(
                                 typeMap = mapOf(navigationCustomArgument<TutorListing>())
                             ) { TutorVerificationScreen() }
 
                         }
 
 
-                        navigation<StudentGraph>(startDestination = StudentGraph.Home) {
+                        navigation<StudentGraph>(startDestination = StudentGraph.Main) {
 
-                            navComposable<StudentGraph.Home> { StudentHomeScreen() }
+                            navComposable<StudentGraph.Main> { StudentMainPage() }
 
                             navComposable<StudentGraph.TutorDetail>(
                                 typeMap = mapOf(navigationCustomArgument<TutorListing>())
                             ) { TutorDetailScreen() }
+
+                        }
+
+                        navigation<TutorGraph>(startDestination = TutorGraph.Home) {
+
+                            navComposable<TutorGraph.Home> { com.buddhatutors.user.presentation.tutor.home.TutorHomeScreen() }
 
                         }
 
@@ -113,7 +163,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
-        CurrentUser.dispose()
+        com.buddhatutors.common.domain.CurrentUser.dispose()
         super.onDestroy()
     }
 }

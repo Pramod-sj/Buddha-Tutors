@@ -10,6 +10,7 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
 import kotlin.reflect.KType
 
 inline fun <reified T : Any> NavGraphBuilder.navComposable(
@@ -42,6 +43,17 @@ inline fun <reified T : Any> NavGraphBuilder.navComposable(
                 animationSpec = tween(350)
             )
         },
+        typeMap = typeMap,
+        content = content
+    )
+}
+
+
+inline fun <reified T : Any> NavGraphBuilder.navDialogComposable(
+    typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap(),
+    noinline content: @Composable() ((NavBackStackEntry) -> Unit),
+) {
+    dialog<T>(
         typeMap = typeMap,
         content = content
     )

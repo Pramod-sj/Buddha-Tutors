@@ -2,6 +2,7 @@ package com.buddhatutors.common
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -58,7 +59,7 @@ fun DynamicSelectTextField(
         )
 
         ExposedDropdownMenu(
-            modifier = Modifier.height(200.dp),
+            modifier = Modifier.heightIn(max = 260.dp),
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
