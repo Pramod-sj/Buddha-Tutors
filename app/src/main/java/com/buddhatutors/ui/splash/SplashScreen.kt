@@ -1,10 +1,12 @@
 package com.buddhatutors.ui.splash
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -13,11 +15,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.navOptions
 import com.buddhatutors.BuildConfig
+import com.buddhatutors.R
 import com.buddhatutors.common.Navigator
 import com.buddhatutors.common.navigation.AdminGraph
 import com.buddhatutors.common.navigation.AuthGraph
@@ -111,7 +117,12 @@ fun SplashScreenContent(uiEvent: (SplashViewModelUiEvent) -> Unit) {
                 .fillMaxSize(),
             contentAlignment = Center,
         ) {
-            Text(text = "Buddha Tutors", style = MaterialTheme.typography.headlineMedium)
+            Image(
+                modifier = Modifier.size(288.dp),
+                painter = painterResource(R.mipmap.ic_launcher_foreground),
+                contentScale = ContentScale.FillBounds,
+                contentDescription = "Splash logo"
+            )
         }
     }
 
