@@ -53,31 +53,8 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var userSessionDataSource: UserSessionDataSource
 
-    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
-
-        val fakeEvent = MotionEvent.obtain(
-            event.downTime,        // Down time of the event (start time of the first touch)
-            event.eventTime,       // Event time of the touch event
-            MotionEvent.ACTION_DOWN, // Action type (ACTION_DOWN for the start of the touch)
-            event.x,               // X position of touch (location where touch happens)
-            event.y,               // Y position of touch (location where touch happens)
-            1f,                    // Pressure (higher for stylus, 1f for full pressure)
-            1f,                    // Size (stylus is more precise, so set size to 1f or smaller)
-            event.metaState,       // Meta state (keyboard state, shift, etc.)
-            event.xPrecision,      // xPrecision: The precision of the touch in the X direction
-            event.yPrecision,      // yPrecision: The precision of the touch in the Y direction
-            event.deviceId,        // Device ID (usually from the original touch event)
-            event.edgeFlags        // Edge flags (e.g., if touch occurs at the edge)
-        )
-
-        return super.dispatchTouchEvent(ev)
-    }
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
 
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(
