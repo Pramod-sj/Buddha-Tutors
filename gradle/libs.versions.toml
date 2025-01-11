@@ -1,11 +1,12 @@
 [versions]
-agp = "8.7.2"
+agp = "8.7.3"
 credentials = "1.3.0"
-firebaseBom = "33.2.0"
+firebaseBom = "33.7.0"
 
 googleApiClientAndroid = "1.32.2"
 googleApiClientGson = "1.33.0"
 googleApiServicesCalendar = "v3-rev411-1.25.0"
+googleAuthLibraryOauth2Http = "1.19.0"
 googleid = "1.1.1"
 gson = "2.11.0"
 javaxInject = "1"
@@ -14,36 +15,37 @@ kotlinxCoroutinesCore = "1.8.1"
 kotlinxSerializationJson = "1.7.3"
 kspPlugin = "2.0.0-1.0.21"
 
-coreKtx = "1.13.1"
+coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.8.5"
-activityCompose = "1.9.2"
+lifecycleRuntimeKtx = "2.8.7"
+activityCompose = "1.9.3"
 composeBom = "2024.12.01"
 
 google-service = "4.4.2"
 
-hilt = "2.51.1"
-lifecycleViewmodelCompose = "2.8.5"
+hilt = "2.52"
+lifecycleViewmodelCompose = "2.8.7"
 moshi = "1.15.1"
 moshiAdapters = "1.15.0"
 moshiKotlin = "1.15.0"
 moshiKotlinCodegen = "1.15.0"
-navigationRuntimeKtx = "2.8.0"
-navigationCompose = "2.8.0"
+navigationRuntimeKtx = "2.8.5"
+navigationCompose = "2.8.5"
 
 hiltNavigation = "1.2.0"
 datastore = "1.1.1"
 firebaseConfigKtx = "22.0.1"
 appcompat = "1.7.0"
 material = "1.12.0"
-navigationCommonKtx = "2.8.3"
+navigationCommonKtx = "2.8.5"
 pagingCommonKtx = "3.3.5"
 pagingCompose = "3.3.5"
 pagingRuntimeKtx = "3.3.5"
-uiTooling = "1.7.5"
-uiToolingPreviewAndroid = "1.7.5"
+playServicesAuth = "21.3.0"
+uiTooling = "1.7.6"
+uiToolingPreviewAndroid = "1.7.6"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -61,6 +63,7 @@ firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 google-api-client-android = { module = "com.google.api-client:google-api-client-android", version.ref = "googleApiClientAndroid" }
 google-api-client-gson = { module = "com.google.api-client:google-api-client-gson", version.ref = "googleApiClientGson" }
 google-api-services-calendar = { module = "com.google.apis:google-api-services-calendar", version.ref = "googleApiServicesCalendar" }
+google-auth-library-oauth2-http = { module = "com.google.auth:google-auth-library-oauth2-http", version.ref = "googleAuthLibraryOauth2Http" }
 googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
@@ -93,6 +96,7 @@ firebase-config-ktx = { group = "com.google.firebase", name = "firebase-config-k
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-navigation-common-ktx = { group = "androidx.navigation", name = "navigation-common-ktx", version.ref = "navigationCommonKtx" }
+play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
 androidx-ui-tooling-preview-android = { group = "androidx.compose.ui", name = "ui-tooling-preview-android", version.ref = "uiToolingPreviewAndroid" }
 

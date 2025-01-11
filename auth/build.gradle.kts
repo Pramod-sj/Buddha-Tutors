@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.buddhatutors.auth"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24
@@ -45,8 +45,6 @@ android {
 
 dependencies {
 
-    implementation(project(":common:domain"))
-    implementation(project(":common:data"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -55,26 +53,22 @@ dependencies {
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.material.icons.extended)
-
-
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.material.icons.extended)
     debugImplementation(libs.ui.tooling)
+    implementation(libs.androidx.ui.tooling.preview)
 
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.android)
-
     implementation(libs.navigation.hilt)
 
     implementation(project(":common"))
     implementation(project(":common:navigation"))
+    implementation(project(":common:domain"))
+    implementation(project(":common:data"))
 
     implementation(libs.kotlinx.serialization.json)
-
 
     // For authentication using Google Sign-In
     implementation(libs.androidx.credentials)
@@ -85,8 +79,8 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
 
-    implementation("com.google.android.gms:play-services-auth:20.5.0")
-    implementation("com.google.auth:google-auth-library-oauth2-http:1.19.0")
+    implementation(libs.play.services.auth)
+    implementation(libs.google.auth.library.oauth2.http)
 
     // Google API Client
     implementation(libs.google.api.client.android)

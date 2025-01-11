@@ -3,10 +3,14 @@ package com.buddhatutors.appadmin.presentation.admin
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MeetingRoom
+import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.MeetingRoom
+import androidx.compose.material.icons.outlined.Shield
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -110,16 +114,16 @@ sealed class AdminBottomNavigationItems(
         AdminBottomNavigationItems(
             route = "/admin/master_tutor",
             label = "Master tutors",
-            unSelectedIcon = Icons.Outlined.MeetingRoom,
-            selectedIcon = Icons.Filled.MeetingRoom
+            unSelectedIcon = Icons.Outlined.Shield,
+            selectedIcon = Icons.Filled.Shield
         )
 
     data object ManageTopic :
         AdminBottomNavigationItems(
             route = "/admin/topic",
             label = "Topic",
-            unSelectedIcon = Icons.Outlined.MeetingRoom,
-            selectedIcon = Icons.Filled.MeetingRoom
+            unSelectedIcon = Icons.Outlined.Book,
+            selectedIcon = Icons.Filled.Book
         )
 
 }

@@ -2,6 +2,8 @@ package com.buddhatutors.ui.splash
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -10,9 +12,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.navOptions
+import com.buddhatutors.BuildConfig
 import com.buddhatutors.common.Navigator
 import com.buddhatutors.common.navigation.AdminGraph
 import com.buddhatutors.common.navigation.AuthGraph
@@ -84,8 +89,22 @@ fun SplashScreen() {
 
 @Composable
 fun SplashScreenContent(uiEvent: (SplashViewModelUiEvent) -> Unit) {
-
-    Scaffold {
+    Scaffold(
+        bottomBar = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding(),
+                contentAlignment = Center
+            ) {
+                Text(
+                    modifier = Modifier.alpha(0.5f),
+                    text = "Version ${BuildConfig.VERSION_NAME}",
+                    fontSize = 12.sp
+                )
+            }
+        }
+    ) {
         Box(
             modifier = Modifier
                 .padding(it)

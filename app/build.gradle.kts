@@ -10,14 +10,14 @@ plugins {
 
 android {
     namespace = "com.buddhatutors"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.buddhatutors"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -44,6 +44,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -107,4 +108,9 @@ dependencies {
     implementation(project(":admin"))
     implementation(project(":user"))
     implementation(project(":user-profile"))
+}
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }

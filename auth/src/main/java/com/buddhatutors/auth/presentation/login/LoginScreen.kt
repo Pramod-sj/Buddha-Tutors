@@ -238,7 +238,7 @@ internal fun LoginScreenContent(
                         keyboardActions = KeyboardActions {
                             focusManager.clearFocus()
                             keyboardController?.hide()
-                            uiEvent(LoginUiEvent.OnLoginClick)
+                            //uiEvent(LoginUiEvent.OnLoginClick)
                         },
                         isError = uiState.validateLoginDataResult.isPasswordValid == false,
                         shape = MaterialTheme.shapes.small,

@@ -137,7 +137,8 @@ internal class UserDataSourceImpl @Inject constructor(
         ) {
             FirestoreUsersPagingSource(
                 userDataRef
-                    .orderBy(Constant.CREATED_AT_FIELD_NAME, Query.Direction.DESCENDING)
+                    .whereEqualTo("userType", type.id)
+                    .orderBy(CREATED_AT_FIELD_NAME, Query.Direction.DESCENDING)
                     .limit(Constant.PAGE_LIMIT)
             )
         }.flow.map { pagingData -> pagingData.map { userEMapper.toDomain(it) } }

@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.buddhatutors.user"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24
@@ -37,8 +37,6 @@ android {
 
 dependencies {
 
-    implementation(project(":common:domain"))
-    implementation(project(":auth"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -47,24 +45,21 @@ dependencies {
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.material.icons.extended)
-
-
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.material.icons.extended)
     debugImplementation(libs.ui.tooling)
+    implementation(libs.androidx.ui.tooling.preview)
 
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.android)
-
     implementation(libs.navigation.hilt)
 
     implementation(project(":common"))
     implementation(project(":common:navigation"))
     implementation(project(":common:utils"))
+    implementation(project(":common:domain"))
+    implementation(project(":auth"))
 
     implementation(libs.androidx.paging.runtime.ktx)
     implementation(libs.androidx.paging.compose)
