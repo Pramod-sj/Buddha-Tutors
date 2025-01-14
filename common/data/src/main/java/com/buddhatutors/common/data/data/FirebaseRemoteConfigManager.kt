@@ -2,11 +2,13 @@ package com.buddhatutors.common.data.data
 
 import com.buddhatutors.common.domain.datasource.RemoteConfigSource
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.tasks.await
 import java.lang.reflect.Type
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 internal class FirebaseRemoteConfigManager @Inject constructor(
@@ -22,6 +24,11 @@ internal class FirebaseRemoteConfigManager @Inject constructor(
 
     init {
         remoteConfig.setDefaultsAsync(emptyMap())
+        remoteConfig.setConfigSettingsAsync(
+            FirebaseRemoteConfigSettings.Builder()
+                .setMinimumFetchIntervalInSeconds(TimeUnit.HOURS.toSeconds(1))
+                .build()
+        )
     }
 
     override suspend fun fetchAndActivate(): Result<Boolean> {
