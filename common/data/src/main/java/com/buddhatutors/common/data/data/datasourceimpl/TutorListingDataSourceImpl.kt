@@ -7,15 +7,20 @@ import androidx.paging.map
 import com.buddhatutors.common.data.Constant
 import com.buddhatutors.common.data.FirebaseCollectionConstant
 import com.buddhatutors.common.data.data.FireStoreAllTutorPagingSource
+import com.buddhatutors.common.data.data.model.TopicEMapper
+import com.buddhatutors.common.data.data.model.UserEMapper
+import com.buddhatutors.common.data.data.model.tutorlisting.TimeSlotEMapper
 import com.buddhatutors.common.data.data.model.tutorlisting.TutorListingE
 import com.buddhatutors.common.data.data.model.tutorlisting.TutorListingEMapper
 import com.buddhatutors.common.data.data.model.tutorlisting.VerificationE
 import com.buddhatutors.common.data.data.model.tutorlisting.VerificationEMapper
+import com.buddhatutors.common.data.toMap
 import com.buddhatutors.common.domain.datasource.TutorListingDataSource
 import com.buddhatutors.common.domain.model.FilterOption
 import com.buddhatutors.common.domain.model.Resource
 import com.buddhatutors.common.domain.model.tutorlisting.TutorListing
 import com.buddhatutors.common.domain.model.user.User
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.flow.Flow
@@ -31,7 +36,10 @@ import kotlin.coroutines.suspendCoroutine
 internal class TutorListingDataSourceImpl @Inject constructor(
     private val firestore: FirebaseFirestore,
     private val tutorListingEMapper: TutorListingEMapper,
-    private val verificationEMapper: VerificationEMapper
+    private val verificationEMapper: VerificationEMapper,
+    private val userEMapper: UserEMapper,
+    private val topicEMapper: TopicEMapper,
+    private val timeSlotEMapper: TimeSlotEMapper
 ) : TutorListingDataSource {
 
     private val tutorsDocumentReference =
@@ -214,6 +222,38 @@ internal class TutorListingDataSourceImpl @Inject constructor(
                 }
         }
 
+    }
+
+    override suspend fun updateTutorListing(tutor: TutorListing): Resource<TutorListing> {
+        return suspendCoroutine { continuation ->
+            val tutorListingEntity = tutorListingEMapper.toEntity(tutor)
+            val updatedMap = mapOf(
+                "tutorUser" to tutorListingEntity.tutorUser
+                    .copy(
+                        name = tutorListingEntity.tutorUser.name,
+                        email = tutorListingEntity.tutorUser.email
+                    ),
+                "languages" to tutorListingEntity.languages,
+                "expertiseIn" to tutorListingEntity.expertiseIn,
+                "availableDays" to tutorListingEntity.availableDays,
+                "availableTimeSlots" to tutorListingEntity.availableTimeSlots,
+                "filteringOptions" to tutorListingEntity.filteringOptions
+            )
+            tutorsDocumentReference
+                .document(tutor.tutorUser.id)
+                .update(updatedMap)
+                .addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        continuation.resume(Resource.Success(tutor))
+                    } else {
+                        continuation.resume(
+                            Resource.Error(
+                                it.exception ?: Throwable("Something went wrong!")
+                            )
+                        )
+                    }
+                }
+        }
     }
 
     override suspend fun updateTutorVerifiedStatus(

@@ -23,6 +23,8 @@ interface TutorListingDataSource {
         tutor: TutorListing
     ): Resource<TutorListing>
 
+    suspend fun updateTutorListing(tutor: TutorListing): Resource<TutorListing>
+
     suspend fun updateTutorVerifiedStatus(
         tutor: TutorListing,
         verifiedByUser: User,

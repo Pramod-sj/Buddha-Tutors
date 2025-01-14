@@ -84,6 +84,7 @@ import com.buddhatutors.common.FullScreenLoader
 import com.buddhatutors.common.Navigator
 import com.buddhatutors.common.StartEndTimeSelectComposable
 import com.buddhatutors.common.MultiSelectionDialog
+import com.buddhatutors.common.TextFieldChipHolder
 import com.buddhatutors.common.domain.model.TimeSlot
 import com.buddhatutors.common.domain.model.Topic
 import com.buddhatutors.common.domain.model.user.UserType
@@ -593,71 +594,5 @@ fun MultiSelectTextFieldDropdown(
         snapshotFlow { mSelectedValues.toList() } // Convert to a list to detect content changes
             .collect { updatedValues -> onValueChangedEvent(updatedValues) }
 
-    }
-}
-
-
-@Composable
-private fun TextFieldChipHolder(
-    label: String,
-    selectedValues: List<String>,
-    onClick: () -> Unit,
-    onRemoveChipClick: (chip: String) -> Unit,
-    trailingIcon: @Composable BoxScope.() -> Unit = {}
-) {
-    val mSelectedValues =
-        remember(selectedValues) { mutableStateListOf(*selectedValues.toTypedArray()) }
-
-    Box(
-        modifier = Modifier
-            .background(
-                color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(0.5f),
-                shape = MaterialTheme.shapes.small
-            )
-            .clip(shape = MaterialTheme.shapes.small)
-            .clickable { onClick() }
-            .then(
-                if (mSelectedValues.isEmpty()) Modifier.padding(16.dp, 8.dp)
-                else Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-            )
-            .heightIn(min = 80.dp)
-            .fillMaxWidth()
-    ) {
-        if (mSelectedValues.isEmpty()) {
-            Text(
-                text = label,
-                Modifier
-                    .align(Alignment.Center)
-                    .alpha(0.4f)
-            )
-        } else {
-            FlowRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                mSelectedValues.forEach { value ->
-                    ElevatedAssistChip(
-                        modifier = Modifier.clickable(enabled = false, onClick = {}),
-                        border = null,
-                        onClick = {},
-                        label = {
-                            Text(value)
-                        },
-                        trailingIcon = {
-                            Icon(
-                                modifier = Modifier
-                                    .size(16.dp)
-                                    .clickable {
-                                        onRemoveChipClick(value)
-                                    },
-                                imageVector = Icons.Outlined.Close,
-                                contentDescription = "Remove",
-                            )
-                        }
-                    )
-                }
-            }
-        }
-        trailingIcon()
     }
 }

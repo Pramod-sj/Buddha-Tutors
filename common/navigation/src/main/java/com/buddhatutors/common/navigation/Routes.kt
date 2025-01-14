@@ -86,6 +86,9 @@ object TutorGraph {
     object Home
 
     @Serializable
+    data class EditTutorAvailability(val tutorId: String)
+
+    @Serializable
     data class BookedSlotDetail(val bookedSlot: BookedSlot)
 
 

@@ -41,6 +41,8 @@ import com.buddhatutors.common.theme.BuddhaTutorTheme
 import com.buddhatutors.ui.splash.SplashScreen
 import com.buddhatutors.user.presentation.student.main.StudentMainPage
 import com.buddhatutors.user.presentation.student.tutorslotbooking.TutorDetailScreen
+import com.buddhatutors.user.presentation.tutor.edit_availability.EditTutorScreen
+import com.buddhatutors.user.presentation.tutor.home.TutorHomeScreen
 import com.buddhatutors.userprofile.ProfileScreen
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -141,7 +143,11 @@ class MainActivity : ComponentActivity() {
 
                         navigation<TutorGraph>(startDestination = TutorGraph.Home) {
 
-                            navComposable<TutorGraph.Home> { com.buddhatutors.user.presentation.tutor.home.TutorHomeScreen() }
+                            navComposable<TutorGraph.Home> { TutorHomeScreen() }
+
+                            navComposable<TutorGraph.EditTutorAvailability>(
+                                typeMap = mapOf(navigationCustomArgument<String>())
+                            ) { EditTutorScreen() }
 
                         }
 

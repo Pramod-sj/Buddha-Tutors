@@ -17,6 +17,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -113,6 +116,12 @@ fun ProfileScreen() {
                 is ProfileUiEffect.ShowMessage -> {
 
                 }
+
+                ProfileUiEffect.NavigateToEditTutorAvailability -> {
+                    navigator.navigate(
+                        route = TutorGraph.EditTutorAvailability(tutorId = uiState.user?.id.orEmpty())
+                    )
+                }
             }
         }
     }
@@ -199,6 +208,29 @@ internal fun ProfileScreenContent(
                 }
 
                 item {
+                    if (uiState.user?.userType == UserType.TUTOR) {
+                        ListItem(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { uiEvent(ProfileUiEvent.UpdateTutorAvailability) },
+                            leadingContent = {
+                                Icon(
+                                    imageVector = Icons.Filled.Edit,
+                                    contentDescription = ""
+                                )
+                            },
+                            headlineContent = { Text("Change availability, expertise") },
+                            trailingContent = {
+                                Icon(
+                                    imageVector = Icons.Default.KeyboardArrowRight,
+                                    contentDescription = ""
+                                )
+                            },
+                        )
+                    }
+                }
+
+                item {
 
                     ListItem(
                         modifier = Modifier
@@ -218,7 +250,6 @@ internal fun ProfileScreenContent(
                             )
                         },
                     )
-
                 }
 
             }

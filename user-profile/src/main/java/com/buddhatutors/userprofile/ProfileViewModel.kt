@@ -38,6 +38,10 @@ internal class ProfileViewModel @Inject constructor(
                     }
                 }
             }
+
+            ProfileUiEvent.UpdateTutorAvailability -> {
+                setEffect { ProfileUiEffect.NavigateToEditTutorAvailability }
+            }
         }
 
     }
@@ -56,6 +60,8 @@ sealed class ProfileUiEvent : UiEvent {
 
     data object LogoutClick : ProfileUiEvent()
 
+    data object UpdateTutorAvailability : ProfileUiEvent()
+
 }
 
 sealed class ProfileUiEffect : UiEffect {
@@ -63,6 +69,8 @@ sealed class ProfileUiEffect : UiEffect {
     data class ShowMessage(val message: String) : ProfileUiEffect()
 
     data class NavigateToLoginPage(val useType: Int) : ProfileUiEffect()
+
+    data object NavigateToEditTutorAvailability : ProfileUiEffect()
 
 }
 
