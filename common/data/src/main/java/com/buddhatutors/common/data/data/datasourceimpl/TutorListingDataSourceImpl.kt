@@ -21,6 +21,7 @@ import com.buddhatutors.common.domain.model.Resource
 import com.buddhatutors.common.domain.model.tutorlisting.TutorListing
 import com.buddhatutors.common.domain.model.user.User
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.flow.Flow
@@ -147,6 +148,8 @@ internal class TutorListingDataSourceImpl @Inject constructor(
         return Pager(PagingConfig(pageSize = Constant.PAGE_SIZE)) {
 
             var queryRef = tutorsDocumentReference.limit(Constant.PAGE_LIMIT)
+
+            queryRef = queryRef.whereEqualTo("verification.approved", true)
 
             // Apply filter for 'languages' if the list is not empty
 
