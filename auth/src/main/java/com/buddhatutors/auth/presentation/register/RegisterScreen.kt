@@ -26,7 +26,6 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedAssistChip
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,7 +40,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.Typography
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -72,10 +70,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.buddhatutors.auth.presentation.forgotpassword.EXTRA_SUCCESSFULLY_SENT_FORGOT_PASS_LINK
 import com.buddhatutors.auth.presentation.termconditions.EXTRA_IS_ACCEPTED
 import com.buddhatutors.common.ActionIconButton
 import com.buddhatutors.common.BTTextField
-import com.buddhatutors.common.DefaultBuddhaTutorTextFieldColors
 import com.buddhatutors.common.FullScreenLoader
 import com.buddhatutors.common.Navigator
 import com.buddhatutors.common.StartEndTimeSelectComposable
@@ -83,6 +81,8 @@ import com.buddhatutors.common.domain.model.TimeSlot
 import com.buddhatutors.common.domain.model.Topic
 import com.buddhatutors.common.navigation.AuthGraph
 import kotlinx.coroutines.launch
+
+const val EXTRA_SUCCESSFULLY_REGISTER = "successfully_register"
 
 @Preview
 @Composable
@@ -184,13 +184,13 @@ fun RegisterScreen() {
     LaunchedEffect(Unit) {
         viewModel.effect.collect { uiEffect ->
             when (uiEffect) {
-                is RegisterUiEffect.ShowErrorMessage -> {
-                    coroutineScope.launch {
-                        snackBarHostState.showSnackbar(message = uiEffect.message)
-                    }
-                }
 
                 RegisterUiEffect.ShowRegisterSuccess -> {
+
+                    navigator.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set(EXTRA_SUCCESSFULLY_REGISTER, true)
+
                     navigator.popBackStack()
                 }
 
@@ -255,8 +255,6 @@ internal fun RegisterScreenContent(
     uiState: RegisterUiState,
     uiEvent: (RegisterUiEvent) -> Unit
 ) {
-
-    var showTopicDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier.padding(16.dp),

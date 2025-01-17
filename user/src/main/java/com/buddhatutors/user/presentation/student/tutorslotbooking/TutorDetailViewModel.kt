@@ -20,6 +20,8 @@ import com.buddhatutors.common.domain.model.tutorlisting.TutorListing
 import com.buddhatutors.common.domain.model.tutorlisting.slotbooking.BookedSlot
 import com.buddhatutors.common.domain.model.tutorlisting.slotbooking.StudentInfo
 import com.buddhatutors.common.domain.model.tutorlisting.slotbooking.TutorInfo
+import com.buddhatutors.common.messaging.Message
+import com.buddhatutors.common.messaging.MessageHelper
 import com.buddhatutors.user.domain.usecase.tutor.GetUpcomingBookedSlotByTutorId
 import com.buddhatutors.common.navigation.StudentGraph
 import com.buddhatutors.common.navigation.navigationCustomArgument
@@ -118,7 +120,7 @@ internal class TutorDetailViewModel @Inject constructor(
                             } else {
                                 //handle error message state
                                 Log.e(TAG, "ERROR:", resource.throwable)
-                                setEffect { TutorDetailUiEffect.ShowErrorMessage(resource.throwable.message.orEmpty()) }
+                                MessageHelper.showMessage(Message.Warning(resource.throwable.message.orEmpty()))
                             }
                         }
 
@@ -166,8 +168,7 @@ internal class TutorDetailViewModel @Inject constructor(
             is Resource.Error -> {
                 //handle error case
                 Log.e("TAG", "ERROR", resource.throwable)
-                setEffect { TutorDetailUiEffect.ShowErrorMessage(resource.throwable.message.orEmpty()) }
-
+                MessageHelper.showMessage(Message.Warning(resource.throwable.message.orEmpty()))
             }
 
             is Resource.Success -> {
@@ -175,6 +176,8 @@ internal class TutorDetailViewModel @Inject constructor(
                 setState { copy(selectedTimeSlot = null, selectedTopic = null) }
 
                 fetchTutorBookedSlots()
+
+                MessageHelper.showMessage(Message.Success("Successfully booked the slot"))
 
                 Log.i("TAG", "SUCCESS")
             }
@@ -356,8 +359,5 @@ sealed class TutorDetailUiEffect : UiEffect {
 
     data class ShowCalendarApiScopeResolutionDialog(val pendingIntent: PendingIntent) :
         TutorDetailUiEffect()
-
-
-    data class ShowErrorMessage(val message: String) : TutorDetailUiEffect()
 
 }

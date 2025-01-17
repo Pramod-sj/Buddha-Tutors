@@ -49,6 +49,8 @@ import com.buddhatutors.appadmin.presentation.common.TutorItemCardPlaceholder
 import com.buddhatutors.common.ActionIconButton
 import com.buddhatutors.common.Navigator
 import com.buddhatutors.common.NoDataScreenContent
+import com.buddhatutors.common.collectAndResetState
+import com.buddhatutors.common.collectAsEffect
 import com.buddhatutors.common.domain.model.tutorlisting.TutorListing
 import com.buddhatutors.common.navigation.AdminGraph
 import com.buddhatutors.common.navigation.ProfileGraph
@@ -84,15 +86,9 @@ fun AdminHomeScreen() {
     val tutorListingPagingItems = viewModel.tutorsPagingData.collectAsLazyPagingItems()
 
     navigator.currentBackStackEntry?.savedStateHandle
-        ?.getStateFlow(EXTRA_TUTOR_CHANGED, false)
-        ?.collectAsEffect {
-            if (it) {
-                tutorListingPagingItems.refresh()
-            }
-            //resetting it to default
-            navigator.currentBackStackEntry?.savedStateHandle
-                ?.set(EXTRA_TUTOR_CHANGED, false)
-        }
+        ?.collectAndResetState(EXTRA_TUTOR_CHANGED, false, {
+
+        })
 
     AdminHomeContent(
         uiState = uiState,
@@ -285,16 +281,5 @@ internal fun AdminHomeContent(
             }
 
         }
-    }
-}
-
-
-@Composable
-fun <T> Flow<T>.collectAsEffect(
-    context: CoroutineContext = EmptyCoroutineContext,
-    block: (T) -> Unit
-) {
-    LaunchedEffect(key1 = Unit) {
-        onEach(block).flowOn(context).launchIn(this)
     }
 }

@@ -46,9 +46,9 @@ import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.buddhatutors.appadmin.Constant.EXTRA_TUTOR_CHANGED
-import com.buddhatutors.appadmin.presentation.admin.home.collectAsEffect
 import com.buddhatutors.common.Navigator
 import com.buddhatutors.common.NoDataScreenContent
+import com.buddhatutors.common.collectAsEffect
 import com.buddhatutors.common.domain.model.Topic
 import com.buddhatutors.common.navigation.AdminGraph
 import com.buddhatutors.common.shimmerBrush

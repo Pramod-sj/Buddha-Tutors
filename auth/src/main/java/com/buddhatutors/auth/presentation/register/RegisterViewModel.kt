@@ -13,6 +13,8 @@ import com.buddhatutors.common.domain.model.user.UserType
 import com.buddhatutors.auth.domain.usecase.RegisterUser
 import com.buddhatutors.auth.domain.usecase.ValidateRegistrationUseCase
 import com.buddhatutors.common.domain.usecase.topic.GetTopics
+import com.buddhatutors.common.messaging.Message
+import com.buddhatutors.common.messaging.MessageHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -109,32 +111,7 @@ internal class RegisterViewModel @Inject constructor(
                 name = currentState.name.orEmpty(),
                 email = currentState.email.orEmpty(),
                 userType = currentState.userType
-            ) /*when (currentState.userType) {
-                UserType.STUDENT -> {
-                    Student(
-                        id = "",
-                        name = currentState.name.orEmpty(),
-                        email = currentState.email.orEmpty()
-                    )
-                }
-
-                UserType.TUTOR -> {
-                    Tutor(
-                        id = "",
-                        name = currentState.name.orEmpty(),
-                        email = currentState.email.orEmpty(),
-                        expertiseIn = currentState.selectedTopics,
-                        availabilityDay = currentState.selectedAvailabilityDay,
-                        timeAvailability = currentState.selectedTimeSlot
-                    )
-                }
-
-                else -> null
-            }*/ ?: run {
-                setState { copy(isRegistrationInProgress = false) }
-                setEffect { RegisterUiEffect.ShowErrorMessage("Operation not allowed") }
-                return@launch
-            }
+            )
 
             when (val resource = registerUser(
                 model = user,
@@ -145,7 +122,7 @@ internal class RegisterViewModel @Inject constructor(
                 timeSlots = currentState.selectedTimeSlots,
             )) {
                 is Resource.Error -> {
-                    setEffect { RegisterUiEffect.ShowErrorMessage(resource.throwable.message.orEmpty()) }
+                    MessageHelper.showMessage(Message.Warning(resource.throwable.message.orEmpty()))
                 }
 
                 is Resource.Success -> {
@@ -279,8 +256,6 @@ internal data class RegisterUiState(
 internal sealed class RegisterUiEffect : UiEffect {
 
     data object ShowRegisterSuccess : RegisterUiEffect()
-
-    data class ShowErrorMessage(val message: String) : RegisterUiEffect()
 
     data object NavigateToTermAndConditionPage :
         RegisterUiEffect()

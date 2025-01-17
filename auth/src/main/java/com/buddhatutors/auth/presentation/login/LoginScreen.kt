@@ -58,12 +58,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.navOptions
+import com.buddhatutors.auth.presentation.forgotpassword.EXTRA_SUCCESSFULLY_SENT_FORGOT_PASS_LINK
+import com.buddhatutors.auth.presentation.register.EXTRA_SUCCESSFULLY_REGISTER
 import com.buddhatutors.auth.presentation.register.TermCondition
 import com.buddhatutors.auth.presentation.register.TermConditionType
 import com.buddhatutors.auth.presentation.termconditions.EXTRA_IS_ACCEPTED
 import com.buddhatutors.common.DefaultBuddhaTutorTextFieldColors
 import com.buddhatutors.common.FullScreenLoader
 import com.buddhatutors.common.Navigator
+import com.buddhatutors.common.collectAndResetState
+import com.buddhatutors.common.messaging.Message
+import com.buddhatutors.common.messaging.MessageHelper
 import com.buddhatutors.common.navigation.AdminGraph
 import com.buddhatutors.common.navigation.AuthGraph
 import com.buddhatutors.common.navigation.MasterTutorGraph
@@ -107,8 +112,6 @@ internal fun LoginScreenContent(
 
     val navigator = Navigator
 
-    val coroutineScope = rememberCoroutineScope()
-
     val snackBarHostState = remember { SnackbarHostState() }
 
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -116,23 +119,6 @@ internal fun LoginScreenContent(
     val focusManager = LocalFocusManager.current
 
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
-
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-    )
-
-    var showBottomSheet by remember { mutableStateOf(false) }
-
-    // Retrieve the saved state handle from the previous back stack entry
-    val savedStateHandle = navigator.currentBackStackEntry?.savedStateHandle
-
-    val termConditionResultState by savedStateHandle
-        ?.getStateFlow(EXTRA_IS_ACCEPTED, false)
-        ?.collectAsState(false) ?: remember { mutableStateOf(false) }
-
-    LaunchedEffect(termConditionResultState) {
-        uiEvent(LoginUiEvent.OnTermsAndConditionsStateChanged(termConditionResultState))
-    }
 
     Scaffold(
         snackbarHost = {
@@ -302,17 +288,6 @@ internal fun LoginScreenContent(
     LaunchedEffect(Unit) {
         uiEffect.collect { uiEffect ->
             when (uiEffect) {
-                is LoginUiEffect.ShowMessage -> {
-                    coroutineScope.launch {
-                        val result = snackBarHostState.showSnackbar(
-                            message = uiEffect.message,
-                            actionLabel = uiEffect.actionButtonLabel
-                        )
-                        if (result == SnackbarResult.ActionPerformed) {
-                            uiEffect.actionButtonCallback?.invoke()
-                        }
-                    }
-                }
 
                 LoginUiEffect.NavigateToRegister -> {
                     navigator.navigate(AuthGraph.RegisterUser)
@@ -363,4 +338,39 @@ internal fun LoginScreenContent(
         }
     }
 
+    //show success message when reset password email is sent
+    navigator.currentBackStackEntry?.savedStateHandle
+        ?.collectAndResetState(
+            key = EXTRA_SUCCESSFULLY_SENT_FORGOT_PASS_LINK,
+            defaultValue = false,
+            onEffect = {
+                if (it) {
+                    MessageHelper.showMessage(Message.Success("Reset password link is sent registered email id"))
+                }
+            })
+
+
+    //show success message when register successfully
+    navigator.currentBackStackEntry?.savedStateHandle
+        ?.collectAndResetState(
+            key = EXTRA_SUCCESSFULLY_REGISTER,
+            defaultValue = false,
+            onEffect = {
+                if (it) {
+                    MessageHelper.showMessage(Message.Success("You have successfully register, please use same email id to login"))
+                }
+            }
+        )
+
+    // Retrieve the saved state handle from the previous back stack entry
+    navigator.currentBackStackEntry?.savedStateHandle
+        ?.collectAndResetState(
+            key = EXTRA_IS_ACCEPTED,
+            defaultValue = false,
+            onEffect = {
+                if (it) {
+                    uiEvent(LoginUiEvent.OnTermsAndConditionsStateChanged(true))
+                }
+            }
+        )
 }

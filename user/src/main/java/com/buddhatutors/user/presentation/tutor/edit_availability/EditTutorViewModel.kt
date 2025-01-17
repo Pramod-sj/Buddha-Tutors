@@ -16,6 +16,8 @@ import com.buddhatutors.common.domain.model.tutorlisting.TutorListing
 import com.buddhatutors.common.domain.model.user.UserType
 import com.buddhatutors.common.domain.usecase.GetLanguages
 import com.buddhatutors.common.domain.usecase.topic.GetTopics
+import com.buddhatutors.common.messaging.Message
+import com.buddhatutors.common.messaging.MessageHelper
 import com.buddhatutors.common.navigation.TutorGraph
 import com.buddhatutors.common.navigation.navigationCustomArgument
 import com.buddhatutors.user.domain.usecase.tutor.GetTutorListingByTutorId
@@ -131,7 +133,7 @@ internal class EditTutorViewModel @Inject constructor(
                 )
             )) {
                 is Resource.Error -> {
-                    setEffect { EditTutorUiEffect.ShowErrorMessage(resource.throwable.message.orEmpty()) }
+                    MessageHelper.showMessage(Message.Warning(resource.throwable.message.orEmpty()))
                 }
 
                 is Resource.Success -> {
@@ -141,10 +143,10 @@ internal class EditTutorViewModel @Inject constructor(
                             selectedTopics = resource.data.expertiseIn,
                             selectedTimeSlots = resource.data.availableTimeSlots,
                             selectedAvailabilityDay = resource.data.availableDays,
-                            languages = resource.data.languages
+                            selectedLanguage = resource.data.languages
                         )
                     }
-                    setEffect { EditTutorUiEffect.ShowEditTutorSuccess }
+                    MessageHelper.showMessage(Message.Success("Tutor data is now updated!"))
                 }
             }
             setState { copy(showFullScreenLoader = false) }
@@ -319,9 +321,5 @@ internal data class EditTutorUiState(
 ) : UiState
 
 internal sealed class EditTutorUiEffect : UiEffect {
-
-    data object ShowEditTutorSuccess : EditTutorUiEffect()
-
-    data class ShowErrorMessage(val message: String) : EditTutorUiEffect()
 
 }

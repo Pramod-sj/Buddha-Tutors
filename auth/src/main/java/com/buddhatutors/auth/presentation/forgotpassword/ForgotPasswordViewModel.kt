@@ -10,6 +10,8 @@ import com.buddhatutors.common.UiEffect
 import com.buddhatutors.common.UiEvent
 import com.buddhatutors.common.UiState
 import com.buddhatutors.common.domain.model.Resource
+import com.buddhatutors.common.messaging.Message
+import com.buddhatutors.common.messaging.MessageHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,15 +31,15 @@ internal class ForgotPasswordViewModel @Inject constructor(
                     setState { copy(showLoader = true) }
                     when (val resource = sendForgotPasswordUseCase(currentState.email.orEmpty())) {
                         is Resource.Error -> {
-                            setEffect {
-                                ForgotPasswordUiEffect.ShowMessage(
-                                    message = resource.throwable.message.orEmpty()
+                            MessageHelper.showMessage(
+                                Message.Warning(
+                                    text = resource.throwable.message.orEmpty()
                                 )
-                            }
+                            )
                         }
 
                         is Resource.Success -> {
-                            setEffect { ForgotPasswordUiEffect.PopupToLoginScreen }
+                            setEffect { ForgotPasswordUiEffect.PopupToLoginScreen(true) }
                         }
                     }
                     setState { copy(showLoader = false) }
@@ -76,13 +78,7 @@ internal data class ForgotPasswordUiState(
 
 internal sealed class ForgotPasswordUiEffect : UiEffect {
 
-    data object PopupToLoginScreen : ForgotPasswordUiEffect()
-
-    data class ShowMessage(
-        val message: String,
-        val actionButtonLabel: String? = null,
-        val actionButtonCallback: (() -> Unit)? = null
-    ) : ForgotPasswordUiEffect()
-
+    data class PopupToLoginScreen(val isSuccessfullySentForgotPasswordMail: Boolean) :
+        ForgotPasswordUiEffect()
 
 }

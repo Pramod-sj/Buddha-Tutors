@@ -64,10 +64,10 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.buddhatutors.appadmin.Constant.EXTRA_TUTOR_CHANGED
-import com.buddhatutors.appadmin.presentation.admin.home.collectAsEffect
 import com.buddhatutors.common.ActionIconButton
 import com.buddhatutors.common.GenericBottomSheet
 import com.buddhatutors.common.Navigator
+import com.buddhatutors.common.collectAsEffect
 import com.buddhatutors.common.domain.model.TimeSlot
 import com.buddhatutors.common.domain.model.tutorlisting.TutorListing
 import com.buddhatutors.common.domain.model.user.User

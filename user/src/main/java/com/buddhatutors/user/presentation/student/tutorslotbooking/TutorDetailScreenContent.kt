@@ -62,6 +62,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.buddhatutors.auth.data.ActivityContextWrapper
+import com.buddhatutors.common.ActionIconButton
 import com.buddhatutors.common.DynamicSelectTextField
 import com.buddhatutors.common.FullScreenLoader
 import com.buddhatutors.common.Navigator
@@ -162,13 +163,6 @@ fun TutorDetailScreen() {
                         IntentSenderRequest.Builder(it.pendingIntent).build()
                     )
                 }
-
-                is TutorDetailUiEffect.ShowErrorMessage -> {
-                    snackBarHostState.showSnackbar(
-                        message = it.message,
-                        duration = SnackbarDuration.Short
-                    )
-                }
             }
 
         }
@@ -185,7 +179,7 @@ fun TutorDetailScreen() {
                     )
                 },
                 navigationIcon = {
-                    com.buddhatutors.common.ActionIconButton(
+                    ActionIconButton(
                         imageVector = Icons.Filled.ArrowBack,
                         iconTint = Color.Black
                     ) {

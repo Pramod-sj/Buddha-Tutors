@@ -15,6 +15,8 @@ import com.buddhatutors.common.domain.model.user.UserType.ADMIN
 import com.buddhatutors.common.domain.model.user.UserType.MASTER_TUTOR
 import com.buddhatutors.common.domain.model.user.UserType.STUDENT
 import com.buddhatutors.common.domain.model.user.UserType.TUTOR
+import com.buddhatutors.common.messaging.Message
+import com.buddhatutors.common.messaging.MessageHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -72,34 +74,39 @@ internal class LoginViewModel @Inject constructor(
 
                 is Resource.Error -> {
                     if (resource.throwable is EmailNotVerifiedException) {
-                        setEffect {
-                            LoginUiEffect.ShowMessage(
-                                resource.throwable.message.orEmpty(),
-                                actionButtonLabel = "Send",
-                                actionButtonCallback = {
-                                    viewModelScope.launch {
-                                        when (val emailVerificationResource =
-                                            sendEmailVerification()) {
-                                            is Resource.Error -> {
-                                                setEffect {
-                                                    LoginUiEffect.ShowMessage(
-                                                        message = emailVerificationResource.throwable.message.orEmpty()
-                                                    )
-                                                }
-                                            }
 
-                                            is Resource.Success -> {
-                                                setEffect {
-                                                    LoginUiEffect.ShowMessage(message = "Verification email sent!")
-                                                }
-                                            }
+                        MessageHelper.showMessage(Message.Warning(
+                            text = resource.throwable.message.orEmpty(),
+                            actionLabel = "Send mail",
+                            actionCallback = {
+                                viewModelScope.launch {
+                                    when (val emailVerificationResource =
+                                        sendEmailVerification()) {
+                                        is Resource.Error -> {
+                                            MessageHelper.showMessage(
+                                                message = Message.Warning(
+                                                    text = emailVerificationResource.throwable.message.orEmpty()
+                                                )
+                                            )
+                                        }
+
+                                        is Resource.Success -> {
+                                            MessageHelper.showMessage(
+                                                message = Message.Success(
+                                                    text = "Verification email sent!"
+                                                )
+                                            )
                                         }
                                     }
                                 }
-                            )
-                        }
+                            }
+                        ))
                     } else {
-                        setEffect { LoginUiEffect.ShowMessage(resource.throwable.message.orEmpty()) }
+                        MessageHelper.showMessage(
+                            message = Message.Warning(
+                                text = resource.throwable.message.orEmpty()
+                            )
+                        )
                     }
                 }
 
@@ -168,13 +175,6 @@ internal data class LoginUiState(
 
 
 internal sealed class LoginUiEffect : UiEffect {
-
-    data class ShowMessage(
-        val message: String,
-        val actionButtonLabel: String? = null,
-        val actionButtonCallback: (() -> Unit)? = null
-    ) : LoginUiEffect()
-
 
     data object NavigateToRegister : LoginUiEffect()
 

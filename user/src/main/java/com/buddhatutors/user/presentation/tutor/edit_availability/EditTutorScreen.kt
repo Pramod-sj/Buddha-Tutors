@@ -67,6 +67,7 @@ import com.buddhatutors.common.StartEndTimeSelectComposable
 import com.buddhatutors.common.TextFieldChipHolder
 import com.buddhatutors.common.domain.model.TimeSlot
 import com.buddhatutors.common.domain.model.Topic
+import com.buddhatutors.common.messaging.MessageHelper
 import kotlinx.coroutines.launch
 
 @Preview
@@ -155,22 +156,6 @@ fun EditTutorScreen() {
             uiEvent = viewModel::setEvent
         )
 
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.effect.collect { uiEffect ->
-            when (uiEffect) {
-                is EditTutorUiEffect.ShowErrorMessage -> {
-                    coroutineScope.launch {
-                        snackBarHostState.showSnackbar(message = uiEffect.message)
-                    }
-                }
-
-                EditTutorUiEffect.ShowEditTutorSuccess -> {
-                    navigator.popBackStack()
-                }
-            }
-        }
     }
 
     if (uiState.isTimepickerDialogVisible) {

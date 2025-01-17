@@ -42,6 +42,8 @@ import com.buddhatutors.common.Navigator
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
+const val EXTRA_SUCCESSFULLY_SENT_FORGOT_PASS_LINK = "successfully_sent_forgot_pass_link"
+
 @Composable
 fun ForgotPasswordScreen() {
 
@@ -65,10 +67,6 @@ internal fun ForgotPasswordContent(
 ) {
 
     val navigator = Navigator
-
-    val coroutineScope = rememberCoroutineScope()
-
-    val snackBarHostState = remember { SnackbarHostState() }
 
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -156,19 +154,11 @@ internal fun ForgotPasswordContent(
     LaunchedEffect(Unit) {
         uiEffect.collect { uiEffect ->
             when (uiEffect) {
-                is ForgotPasswordUiEffect.ShowMessage -> {
-                    coroutineScope.launch {
-                        val result = snackBarHostState.showSnackbar(
-                            message = uiEffect.message,
-                            actionLabel = uiEffect.actionButtonLabel
-                        )
-                        if (result == SnackbarResult.ActionPerformed) {
-                            uiEffect.actionButtonCallback?.invoke()
-                        }
-                    }
-                }
 
-                ForgotPasswordUiEffect.PopupToLoginScreen -> {
+                is ForgotPasswordUiEffect.PopupToLoginScreen -> {
+                    navigator.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set(EXTRA_SUCCESSFULLY_SENT_FORGOT_PASS_LINK, true)
                     navigator.popBackStack()
                 }
 

@@ -7,7 +7,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.compose.NavHost
@@ -25,8 +34,12 @@ import com.buddhatutors.auth.presentation.login.LoginScreen
 import com.buddhatutors.auth.presentation.register.RegisterScreen
 import com.buddhatutors.auth.presentation.termconditions.TermConditionScreen
 import com.buddhatutors.common.BuddhaTutorsProvider
+import com.buddhatutors.common.collectAsEffect
 import com.buddhatutors.common.domain.CurrentUser
 import com.buddhatutors.common.domain.model.tutorlisting.TutorListing
+import com.buddhatutors.common.messaging.Message
+import com.buddhatutors.common.messaging.MessageComposable
+import com.buddhatutors.common.messaging.MessageHelper
 import com.buddhatutors.common.navComposable
 import com.buddhatutors.common.navDialogComposable
 import com.buddhatutors.common.navigation.AdminGraph
@@ -77,84 +90,103 @@ class MainActivity : ComponentActivity() {
 
             val navController = rememberNavController()
 
+            var message by remember { mutableStateOf<Message?>(null) }
+
+            MessageHelper.message.collectAsEffect {
+                message = it
+            }
+
             BuddhaTutorsProvider(navHost = navController) {
 
                 BuddhaTutorTheme {
 
-                    NavHost(
-                        navController = navController,
-                        startDestination = Splash
-                    ) {
+                    Box(modifier = Modifier.fillMaxSize()) {
 
-                        navComposable<Splash> { SplashScreen() }
+                        NavHost(
+                            navController = navController,
+                            startDestination = Splash
+                        ) {
 
-                        navigation<AuthGraph>(startDestination = AuthGraph.LoginUser) {
+                            navComposable<Splash> { SplashScreen() }
 
-                            navComposable<AuthGraph.LoginUser> { LoginScreen() }
+                            navigation<AuthGraph>(startDestination = AuthGraph.LoginUser) {
 
-                            navDialogComposable<AuthGraph.ForgotPassword> { ForgotPasswordScreen() }
+                                navComposable<AuthGraph.LoginUser> { LoginScreen() }
 
-                            navComposable<AuthGraph.RegisterUser> { RegisterScreen() }
+                                navDialogComposable<AuthGraph.ForgotPassword> { ForgotPasswordScreen() }
 
-                            navComposable<AuthGraph.TermAndConditions> { TermConditionScreen() }
+                                navComposable<AuthGraph.RegisterUser> { RegisterScreen() }
 
+                                navComposable<AuthGraph.TermAndConditions> { TermConditionScreen() }
+
+
+                            }
+
+
+                            navigation<AdminGraph>(startDestination = AdminGraph.Home) {
+
+                                navComposable<AdminGraph.Home> { AdminMainScreen() }
+
+                                navComposable<AdminGraph.AddTutor> { AddTutorUserScreen() }
+
+                                navComposable<AdminGraph.AddMasterTutorUser> { AddMasterTutorUserScreen() }
+
+                                navComposable<AdminGraph.AdminTutorVerification>(
+                                    typeMap = mapOf(navigationCustomArgument<TutorListing>())
+                                ) { TutorVerificationScreen() }
+
+                                navDialogComposable<AdminGraph.AddTopic> { AddTopicScreen() }
+
+                            }
+
+                            navigation<MasterTutorGraph>(startDestination = MasterTutorGraph.MasterTutorHome) {
+
+                                navComposable<MasterTutorGraph.MasterTutorHome> { MasterTutorHomeScreen() }
+
+                                navComposable<MasterTutorGraph.AddMasterTutorUser> { AddTutorUserScreen() }
+
+                                navComposable<MasterTutorGraph.AdminTutorVerification>(
+                                    typeMap = mapOf(navigationCustomArgument<TutorListing>())
+                                ) { TutorVerificationScreen() }
+
+                            }
+
+
+                            navigation<StudentGraph>(startDestination = StudentGraph.Main) {
+
+                                navComposable<StudentGraph.Main> { StudentMainPage() }
+
+                                navComposable<StudentGraph.TutorDetail>(
+                                    typeMap = mapOf(navigationCustomArgument<TutorListing>())
+                                ) { TutorDetailScreen() }
+
+                            }
+
+                            navigation<TutorGraph>(startDestination = TutorGraph.Home) {
+
+                                navComposable<TutorGraph.Home> { TutorHomeScreen() }
+
+                                navComposable<TutorGraph.EditTutorAvailability>(
+                                    typeMap = mapOf(navigationCustomArgument<String>())
+                                ) { EditTutorScreen() }
+
+                            }
+
+                            navigation<ProfileGraph>(startDestination = ProfileGraph.Home) {
+
+                                navComposable<ProfileGraph.Home> { ProfileScreen() }
+
+                            }
 
                         }
 
-
-                        navigation<AdminGraph>(startDestination = AdminGraph.Home) {
-
-                            navComposable<AdminGraph.Home> { AdminMainScreen() }
-
-                            navComposable<AdminGraph.AddTutor> { AddTutorUserScreen() }
-
-                            navComposable<AdminGraph.AddMasterTutorUser> { AddMasterTutorUserScreen() }
-
-                            navComposable<AdminGraph.AdminTutorVerification>(
-                                typeMap = mapOf(navigationCustomArgument<TutorListing>())
-                            ) { TutorVerificationScreen() }
-
-                            navDialogComposable<AdminGraph.AddTopic> { AddTopicScreen() }
-
-                        }
-
-                        navigation<MasterTutorGraph>(startDestination = MasterTutorGraph.MasterTutorHome) {
-
-                            navComposable<MasterTutorGraph.MasterTutorHome> { MasterTutorHomeScreen() }
-
-                            navComposable<MasterTutorGraph.AddMasterTutorUser> { AddTutorUserScreen() }
-
-                            navComposable<MasterTutorGraph.AdminTutorVerification>(
-                                typeMap = mapOf(navigationCustomArgument<TutorListing>())
-                            ) { TutorVerificationScreen() }
-
-                        }
-
-
-                        navigation<StudentGraph>(startDestination = StudentGraph.Main) {
-
-                            navComposable<StudentGraph.Main> { StudentMainPage() }
-
-                            navComposable<StudentGraph.TutorDetail>(
-                                typeMap = mapOf(navigationCustomArgument<TutorListing>())
-                            ) { TutorDetailScreen() }
-
-                        }
-
-                        navigation<TutorGraph>(startDestination = TutorGraph.Home) {
-
-                            navComposable<TutorGraph.Home> { TutorHomeScreen() }
-
-                            navComposable<TutorGraph.EditTutorAvailability>(
-                                typeMap = mapOf(navigationCustomArgument<String>())
-                            ) { EditTutorScreen() }
-
-                        }
-
-                        navigation<ProfileGraph>(startDestination = ProfileGraph.Home) {
-
-                            navComposable<ProfileGraph.Home> { ProfileScreen() }
-
+                        message?.let { messageData ->
+                            MessageComposable(
+                                message = messageData,
+                                onDismiss = {
+                                    message = null
+                                }
+                            )
                         }
 
                     }
@@ -166,7 +198,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
-        com.buddhatutors.common.domain.CurrentUser.dispose()
+        CurrentUser.dispose()
         super.onDestroy()
     }
 }
