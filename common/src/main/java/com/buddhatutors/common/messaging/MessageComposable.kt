@@ -58,7 +58,7 @@ fun MessageComposable(
 
     val localView = LocalView.current
 
-    val isVisible = remember { MutableTransitionState(true) }
+    val isVisible = remember { MutableTransitionState(false) }
 
     // Trigger visibility change only when the message object changes
     LaunchedEffect(key1 = message) {
