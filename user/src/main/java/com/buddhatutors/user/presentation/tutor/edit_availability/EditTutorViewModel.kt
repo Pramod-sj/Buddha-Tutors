@@ -100,6 +100,18 @@ internal class EditTutorViewModel @Inject constructor(
             is EditTutorUiEvent.UpdateLanguageDialogVisibility -> {
                 setState { copy(isLanguageSelectionDialogVisible = event.isVisible) }
             }
+
+            is EditTutorUiEvent.OnDayAvailabilityRemoved -> {
+                val newList = currentState.selectedAvailabilityDay.toMutableList()
+                    .apply { remove(event.day) }
+                setState { copy(selectedAvailabilityDay = newList.toMutableSet().toList()) }
+            }
+
+            is EditTutorUiEvent.OnLanguageItemRemoved -> {
+                val newList = currentState.selectedLanguage.toMutableList()
+                    .apply { remove(event.language) }
+                setState { copy(selectedLanguage = newList.toMutableSet().toList()) }
+            }
         }
     }
 
@@ -234,17 +246,25 @@ internal sealed class EditTutorUiEvent : UiEvent {
 
     data class OnDayAvailabilityChanged(val days: List<String>) : EditTutorUiEvent()
 
+    data class OnDayAvailabilityRemoved(val day: String) : EditTutorUiEvent()
+
+
     data class OnTimeSlotAdded(val timeSlot: TimeSlot) :
         EditTutorUiEvent()
 
     data class OnTimeSlotRemoved(val timeSlot: TimeSlot) :
         EditTutorUiEvent()
 
-    data class OnTopicItemRemoved(val topic: Topic) : EditTutorUiEvent()
 
     data class OnExpertiseTopicChanged(val topics: List<String>) : EditTutorUiEvent()
 
+    data class OnTopicItemRemoved(val topic: Topic) : EditTutorUiEvent()
+
+
     data class OnLanguageSelectionChanged(val languages: List<String>) : EditTutorUiEvent()
+
+    data class OnLanguageItemRemoved(val language: String) : EditTutorUiEvent()
+
 
     data object UpdateButtonClick : EditTutorUiEvent()
 

@@ -9,7 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,6 +23,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -267,7 +268,6 @@ internal fun EditTutorScreenContent(
     uiEvent: (EditTutorUiEvent) -> Unit
 ) {
 
-    var showTopicDialog by remember { mutableStateOf(false) }
 
     if (uiState.showInitialLoader) {
 
@@ -322,21 +322,20 @@ internal fun EditTutorScreenContent(
 
             //wrap inside a column because there was a jump when view is hidden in AnimatedVisibility
             Column(
-                Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
 
                 Column(modifier = Modifier.fillMaxWidth()) {
 
-                    Spacer(Modifier.height(6.dp))
-
-                    Text(
-                        text = "Expertise in ",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.clickable { showTopicDialog = true }
+                    HeaderWithEditButton(
+                        label = "Expertise in",
+                        onClick = {
+                            uiEvent(EditTutorUiEvent.UpdateTopicsDialogVisibility(true))
+                        }
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(2.dp))
 
                     TextFieldChipHolder(
                         label = "Click here to add topics",
@@ -352,15 +351,18 @@ internal fun EditTutorScreenContent(
                         }
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                }
 
-                    Text(
-                        text = "Speaks in",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.clickable { showTopicDialog = true }
+                Column(modifier = Modifier.fillMaxWidth()) {
+
+                    HeaderWithEditButton(
+                        label = "Speaks in",
+                        onClick = {
+                            uiEvent(EditTutorUiEvent.UpdateLanguageDialogVisibility(true))
+                        }
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(2.dp))
 
                     TextFieldChipHolder(
                         label = "Click here to add languages",
@@ -369,33 +371,24 @@ internal fun EditTutorScreenContent(
                             uiEvent(EditTutorUiEvent.UpdateLanguageDialogVisibility(true))
                         },
                         onRemoveChipClick = { chipLabel ->
-                            //uiEvent(AddUserUiEvent.OnLanguageSelectionChanged(it))
+                            uiState.languages.find { it == chipLabel }
+                                ?.let {
+                                    uiEvent(EditTutorUiEvent.OnLanguageItemRemoved(it))
+                                }
+                        }
+                    )
+                }
+
+                Column(modifier = Modifier.fillMaxWidth()) {
+
+                    HeaderWithEditButton(
+                        label = "Day availability",
+                        onClick = {
+                            uiEvent(EditTutorUiEvent.UpdateDaysDialogVisibility(true))
                         }
                     )
 
-                    /*MultiSelectTextFieldDropdown(
-                    modifier = Modifier.fillMaxWidth(),
-                    selectedValues = uiState.selectedLanguage,
-                    options = uiState.languages,
-                    label = "Select language of teaching",
-                    onValueChangedEvent = { value ->
-                        uiEvent(AddUserUiEvent.OnLanguageSelectionChanged(value))
-                    },
-                    dropDownHeightInDp = 200.dp
-                )*/
-
-                }
-
-                Column {
-
-                    Spacer(Modifier.height(8.dp))
-
-                    Text(
-                        "Please choose availability",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(2.dp))
 
                     TextFieldChipHolder(
                         selectedValues = uiState.selectedAvailabilityDay,
@@ -403,12 +396,27 @@ internal fun EditTutorScreenContent(
                         onClick = {
                             uiEvent(EditTutorUiEvent.UpdateDaysDialogVisibility(true))
                         },
-                        onRemoveChipClick = {
+                        onRemoveChipClick = { chipLabel ->
+                            uiState.days.find { it.second == chipLabel }
+                                ?.let {
+                                    uiEvent(EditTutorUiEvent.OnDayAvailabilityRemoved(it.second))
+                                }
 
                         }
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                }
+
+                Column(modifier = Modifier.fillMaxWidth()) {
+
+                    HeaderWithEditButton(
+                        label = "Time availability",
+                        onClick = {
+                            uiEvent(EditTutorUiEvent.UpdateTimePickerDialogVisibility(true))
+                        }
+                    )
+
+                    Spacer(modifier = Modifier.height(2.dp))
 
                     TextFieldChipHolder(
                         label = "Click here to add timeslots",
@@ -428,21 +436,7 @@ internal fun EditTutorScreenContent(
                             )
                         }
                     )
-
-
-                    /* AvailabilityCalendarChooser(
-             selectedDays = uiState.selectedAvailabilityDay,
-             selectedTimeSlot = uiState.selectedTimeSlot,
-             onDaysSelectionChangeEvent = { days ->
-                 uiEvent(RegisterUiEvent.OnDayAvailabilityChanged(days))
-             },
-             onTimeSelectionChangeEvent = { timeSlot ->
-                 uiEvent(RegisterUiEvent.OnTimeAvailabilityChanged(timeSlot))
-             }
-         )*/
                 }
-
-                Spacer(Modifier.height(16.dp))
 
             }
 
@@ -450,4 +444,32 @@ internal fun EditTutorScreenContent(
 
     }
 
+}
+
+@Composable
+fun HeaderWithEditButton(
+    label: String,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        Text(
+            text = label,
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.clickable { onClick() }
+        )
+
+        Spacer(Modifier.weight(1f))
+
+        ActionIconButton(
+            imageVector = Icons.Outlined.Edit,
+            iconTint = Color.Black
+        ) {
+            onClick()
+        }
+
+    }
 }

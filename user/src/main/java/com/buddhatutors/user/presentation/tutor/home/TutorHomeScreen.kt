@@ -31,7 +31,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.VideoCameraFront
+import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
@@ -281,7 +283,6 @@ internal fun StudentHomeScreenContent(
                     } else {
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
 
                             items(bookedSlots) { bookedSlot ->
@@ -295,6 +296,7 @@ internal fun StudentHomeScreenContent(
                                             )
                                         )
                                     })
+                                HorizontalDivider(color = DividerDefaults.color.copy(alpha = 0.3f))
                             }
                         }
                     }
@@ -315,7 +317,8 @@ fun BookedSlotItemCard(
         modifier = Modifier
             .wrapContentHeight()
             .fillMaxWidth()
-            .clickable { onMeetingClick() },
+            .clickable { onMeetingClick() }
+            .padding(vertical = 6.dp),
     ) {
 
         Row(

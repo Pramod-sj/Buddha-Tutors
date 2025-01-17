@@ -9,6 +9,8 @@ import androidx.credentials.GetCredentialRequest
 import com.buddhatutors.auth.domain.ContextWrapper
 import com.buddhatutors.auth.domain.datasource.KEY_ID_TOKEN
 import com.buddhatutors.auth.domain.datasource.UserSessionDataSource
+import com.buddhatutors.common.domain.CurrentUser
+import com.buddhatutors.common.domain.model.Resource
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
@@ -29,7 +31,7 @@ internal class GoogleSignInOAuthHandlerImpl @Inject constructor(
 
     companion object {
         const val SERVER_CLIENT_ID =
-            "939778233487-eoh0f5o5n53k3le4u6447ed600eabpr4.apps.googleusercontent.com"
+            "63972000114-53ldpb2ddg300nk80lj5hmo98r289oun.apps.googleusercontent.com"
     }
 
     override suspend fun authenticate(contextWrapper: ContextWrapper): com.buddhatutors.common.domain.model.Resource<String> {
@@ -37,14 +39,14 @@ internal class GoogleSignInOAuthHandlerImpl @Inject constructor(
         val existingIdToken = userSessionDataSource.getUserToken(KEY_ID_TOKEN)
 
         if (existingIdToken != null) {
-            return com.buddhatutors.common.domain.model.Resource.Success(existingIdToken)
+            return Resource.Success(existingIdToken)
         }
 
         val activityContextWrapper = contextWrapper.getContext()
-            ?: return com.buddhatutors.common.domain.model.Resource.Error(Throwable("Context provided is not a activity context"))
+            ?: return Resource.Error(Throwable("Context provided is not a activity context"))
 
         val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-            .setAutoSelectEnabled(false)
+            .setAutoSelectEnabled(true)
             .setFilterByAuthorizedAccounts(false)
             .setServerClientId(SERVER_CLIENT_ID)
             .build()
@@ -69,32 +71,32 @@ internal class GoogleSignInOAuthHandlerImpl @Inject constructor(
                             val googleIdTokenCredential = GoogleIdTokenCredential
                                 .createFrom(credential.data)
 
-                            if (googleIdTokenCredential.id == com.buddhatutors.common.domain.CurrentUser.user.value?.email) {
+                            if (googleIdTokenCredential.id == CurrentUser.user.value?.email) {
                                 Log.i("idToken:", googleIdTokenCredential.idToken)
-                                com.buddhatutors.common.domain.model.Resource.Success(googleIdTokenCredential.idToken).also {
+                                Resource.Success(googleIdTokenCredential.idToken).also {
                                     userSessionDataSource.saveUserTokens(map = mapOf(KEY_ID_TOKEN to it.data))
                                 }
                             } else {
                                 credentialManager.clearCredentialState(ClearCredentialStateRequest())
-                                com.buddhatutors.common.domain.model.Resource.Error(Throwable("Please select the email id you used to login"))
+                                Resource.Error(Throwable("Please select the email id you used to login"))
                             }
                         } catch (e: GoogleIdTokenParsingException) {
-                            com.buddhatutors.common.domain.model.Resource.Error(Throwable("Received an invalid google id token response: " + e.message))
+                            Resource.Error(Throwable("Received an invalid google id token response: " + e.message))
                         }
                     } else {
                         // Catch any unrecognized custom credential type here.
-                        com.buddhatutors.common.domain.model.Resource.Error(Throwable("Unexpected type of credential"))
+                        Resource.Error(Throwable("Unexpected type of credential"))
                     }
                 }
 
                 else -> {
                     // Catch any unrecognized credential type here.
-                    com.buddhatutors.common.domain.model.Resource.Error(Throwable("Unexpected type of credential"))
+                    Resource.Error(Throwable("Unexpected type of credential"))
                 }
             }
 
         } catch (e: Exception) {
-            com.buddhatutors.common.domain.model.Resource.Error(Throwable("Unexpected type of credential: " + e.message))
+            Resource.Error(Throwable("Unexpected type of credential: " + e.message))
         }
     }
 

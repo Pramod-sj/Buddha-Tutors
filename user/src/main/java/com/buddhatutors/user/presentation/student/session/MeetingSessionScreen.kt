@@ -2,7 +2,6 @@
 
 package com.buddhatutors.user.presentation.student.session
 
-import android.content.res.Resources.Theme
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -30,7 +29,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Event
-import androidx.compose.material.icons.outlined.VideoCameraFront
 import androidx.compose.material.icons.outlined.Videocam
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api

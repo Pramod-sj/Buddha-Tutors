@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.compose.compiler) apply false
     alias(libs.plugins.kotlin.serializable) apply false
+    id("com.google.firebase.crashlytics") version "3.0.2" apply false
 
     kotlin("jvm") version "2.0.0"
 }
