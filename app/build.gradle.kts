@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlin.serializable)
     id("kotlin-parcelize")
 }
 
@@ -48,7 +49,7 @@ android {
         compose = true
         buildConfig = true
     }
-    
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -88,6 +89,7 @@ dependencies {
     implementation(libs.firebase.firestore)
     //implementation(libs.firebase.crashlytics)
 
+    implementation(libs.kotlinx.serialization.json)
 
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.android)
@@ -103,12 +105,31 @@ dependencies {
     ksp(libs.moshi.kotlin.codegen)
 
     implementation(project(":common"))
-    implementation(project(":common:navigation"))
-    implementation(project(":common:domain"))
-    implementation(project(":auth"))
-    implementation(project(":admin"))
-    implementation(project(":user"))
-    implementation(project(":user-profile"))
+
+    implementation(project(":core:domain"))
+    implementation(project(":core:data"))
+
+    implementation(project(":core:auth:domain"))
+    implementation(project(":core:auth:data"))
+
+    implementation(project(":feature:login"))
+    implementation(project(":feature:registration"))
+    implementation(project(":feature:forgotpassword"))
+    implementation(project(":feature:termconditions"))
+    implementation(project(":feature:userprofile"))
+
+    implementation(project(":feature:admin:admin-main"))
+    implementation(project(":feature:admin:master-home"))
+    implementation(project(":feature:admin:add-tutor"))
+    implementation(project(":feature:admin:add-master-tutor"))
+    implementation(project(":feature:admin:add-topic"))
+    implementation(project(":feature:admin:tutor-detail-verification"))
+
+    implementation(project(":feature:tutor:home"))
+    implementation(project(":feature:tutor:edit-tutor"))
+
+    implementation(project(":feature:student:home"))
+    implementation(project(":feature:student:slot-booking"))
 }
 java {
     toolchain {

@@ -5,9 +5,9 @@ import com.buddhatutors.common.BaseViewModel
 import com.buddhatutors.common.UiEffect
 import com.buddhatutors.common.UiEvent
 import com.buddhatutors.common.UiState
-import com.buddhatutors.common.domain.CurrentUser
-import com.buddhatutors.common.domain.model.user.UserType
-import com.buddhatutors.common.domain.usecase.remoteconfig.FetchRemoteConfigUseCase
+import com.buddhatutors.domain.CurrentUser
+import com.buddhatutors.model.user.UserType
+import com.buddhatutors.domain.usecase.remoteconfig.FetchRemoteConfigUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

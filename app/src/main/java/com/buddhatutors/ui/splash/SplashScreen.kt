@@ -25,21 +25,27 @@ import androidx.navigation.navOptions
 import com.buddhatutors.BuildConfig
 import com.buddhatutors.R
 import com.buddhatutors.common.Navigator
-import com.buddhatutors.common.navigation.AdminGraph
-import com.buddhatutors.common.navigation.AuthGraph
-import com.buddhatutors.common.navigation.MasterTutorGraph
-import com.buddhatutors.common.navigation.Splash
-import com.buddhatutors.common.navigation.StudentGraph
-import com.buddhatutors.common.navigation.TutorGraph
 
 @Preview
 @Composable
 internal fun PreviewSplashPage() {
-    SplashScreen()
+    SplashScreen(
+        openLoginPage = TODO(),
+        openStudentHomePage = TODO(),
+        openTutorHomePage = TODO(),
+        openAdminHomePage = TODO(),
+        openMasterTutorHomePage = TODO()
+    )
 }
 
 @Composable
-fun SplashScreen() {
+fun SplashScreen(
+    openLoginPage: () -> Unit,
+    openStudentHomePage: () -> Unit,
+    openTutorHomePage: () -> Unit,
+    openAdminHomePage: () -> Unit,
+    openMasterTutorHomePage: () -> Unit,
+) {
 
     val navigator = Navigator
 
@@ -54,36 +60,51 @@ fun SplashScreen() {
         viewModel.effect.collect {
             when (it) {
                 SplashViewModelUiEffect.NavigateToAuthFlow -> {
+                    openLoginPage()
+/*
                     navigator.navigate(
                         route = AuthGraph,
                         navOptions = navOptions { popUpTo(Splash) { inclusive = true } }
                     )
+*/
                 }
 
                 SplashViewModelUiEffect.NavigateToStudentFlow -> {
+                    openStudentHomePage()
+/*
                     navigator.navigate(
                         route = StudentGraph,
                         navOptions = navOptions { popUpTo(Splash) { inclusive = true } })
+*/
                 }
 
                 SplashViewModelUiEffect.NavigateToTutorHomeFlow -> {
+                    openTutorHomePage()
+/*
                     navigator.navigate(
                         route = TutorGraph,
                         navOptions = navOptions { popUpTo(Splash) { inclusive = true } })
+*/
                 }
 
                 SplashViewModelUiEffect.NavigateToAdminFlow -> {
+                    openAdminHomePage()
+/*
                     navigator.navigate(
                         route = AdminGraph,
                         navOptions = navOptions { popUpTo(Splash) { inclusive = true } }
                     )
+*/
                 }
 
                 SplashViewModelUiEffect.NavigateToMasterTutorFlow -> {
+                    openMasterTutorHomePage()
+/*
                     navigator.navigate(
                         route = MasterTutorGraph,
                         navOptions = navOptions { popUpTo(Splash) { inclusive = true } }
                     )
+*/
                 }
             }
         }
