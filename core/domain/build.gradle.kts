@@ -1,9 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
-    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serializable)
-    id("kotlin-parcelize")
 }
 
 android {
@@ -37,33 +35,20 @@ android {
 
 dependencies {
 
-    implementation(project(":common"))
-
-    implementation(libs.androidx.core.ktx)
-
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.navigation.runtime.ktx)
-    implementation(libs.androidx.navigation.compose)
-
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.ui.tooling.preview.android)
-
-    implementation(project(":common:utils"))
-
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    debugImplementation(libs.ui.tooling)
-
-    implementation(libs.kotlinx.serialization.json)
-
-    implementation(libs.javax.inject)
-    implementation(libs.kotlinx.coroutines.core)
-
-    implementation(libs.gson)
-
+    // AndroidX Libraries
     implementation(libs.androidx.paging.common.ktx)
 
+    // Kotlin Libraries
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.coroutines.core)
+
+    // Dependency Injection
+    implementation(libs.javax.inject)
+
+    // JSON Parsing
+    implementation(libs.gson)
+
+    // Module Dependencies
     api(project(":core:model"))
+
 }
