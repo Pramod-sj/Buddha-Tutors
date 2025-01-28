@@ -59,10 +59,10 @@ internal fun PreviewProfilePage() {
 
 @Composable
 fun ProfileScreen(
-    openLoginPage: () -> Unit,
+    openLoginPage: (userType: UserType) -> Unit,
     openEditTutorPage: (tutorId: String) -> Unit
 ) {
-    
+
     val viewModel = hiltViewModel<ProfileViewModel>()
 
     val uiState by viewModel.uiState.collectAsState()
@@ -104,7 +104,7 @@ fun ProfileScreen(
 
                         }
                     )*/
-                    openLoginPage()
+                    openLoginPage(effect.useType.toUserType() ?: UserType.STUDENT)
                 }
 
                 is ProfileUiEffect.ShowMessage -> {

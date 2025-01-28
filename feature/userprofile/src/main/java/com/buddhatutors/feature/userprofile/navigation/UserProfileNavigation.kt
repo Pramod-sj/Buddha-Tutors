@@ -6,6 +6,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.buddhatutors.common.navComposable
 import com.buddhatutors.feature.userprofile.ProfileScreen
+import com.buddhatutors.model.user.UserType
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -15,7 +16,7 @@ fun NavController.navigateToUserProfileScreen(navOptions: NavOptions? = null) =
     navigate(route = UserProfile, navOptions)
 
 fun NavGraphBuilder.registerUserProfileScreen(
-    openLoginPage: () -> Unit,
+    openLoginPage: (userType: UserType) -> Unit,
     openEditTutorPage: (tutorId: String) -> Unit
 ) {
     navComposable<UserProfile> {

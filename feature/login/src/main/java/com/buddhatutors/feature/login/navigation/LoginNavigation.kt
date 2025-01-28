@@ -9,11 +9,11 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-object LoginUser
+object LoginRoute
 
 fun NavController.navigateToLoginScreen(navOptions: NavOptions? = null) =
-    navigate(route = LoginUser, navOptions)
+    navigate(route = LoginRoute, navOptions)
 
 fun NavGraphBuilder.registerLoginScreen(loginNavigationHandler: ExternalLoginNavigationHandler) {
-    composable<LoginUser> { LoginScreen(loginNavigationHandler) }
+    composable<LoginRoute> { LoginScreen(loginNavigationHandler) }
 }

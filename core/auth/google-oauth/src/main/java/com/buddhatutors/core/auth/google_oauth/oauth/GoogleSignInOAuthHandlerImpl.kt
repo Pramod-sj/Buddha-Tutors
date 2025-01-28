@@ -37,7 +37,7 @@ internal class GoogleSignInOAuthHandlerImpl @Inject constructor(
         }
 
         val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-            .setAutoSelectEnabled(true)
+            .setAutoSelectEnabled(false)
             .setFilterByAuthorizedAccounts(false)
             .setServerClientId(SERVER_CLIENT_ID)
             .build()

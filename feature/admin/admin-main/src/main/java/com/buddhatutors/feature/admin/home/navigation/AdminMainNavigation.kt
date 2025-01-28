@@ -9,10 +9,10 @@ import com.buddhatutors.model.tutorlisting.TutorListing
 import kotlinx.serialization.Serializable
 
 @Serializable
-object AdminMainScreen
+object AdminMainScreenRoute
 
 fun NavController.navigateToAdminMainPage(navOptions: NavOptions? = null) =
-    navigate(route = AdminMainScreen, navOptions)
+    navigate(route = AdminMainScreenRoute, navOptions)
 
 fun NavGraphBuilder.registerAdminMainScreen(
     openAddTutorPage: () -> Unit,
@@ -21,7 +21,7 @@ fun NavGraphBuilder.registerAdminMainScreen(
     openAddMasterTutorPage: () -> Unit,
     openAddTopicPage: () -> Unit
 ) {
-    navComposable<AdminMainScreen> {
+    navComposable<AdminMainScreenRoute> {
         AdminMainScreen(
             openAddTutorPage = openAddTutorPage,
             openTutorVerificationPage = openTutorVerificationPage,

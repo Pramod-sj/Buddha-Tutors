@@ -34,8 +34,10 @@ import com.buddhatutors.feature.admin.add_topic.navigation.navigateToAddTopic
 import com.buddhatutors.feature.admin.add_topic.navigation.registerAddTopic
 import com.buddhatutors.feature.admin.add_tutor.navigation.navigateToAddTutor
 import com.buddhatutors.feature.admin.add_tutor.navigation.registerAddTutor
+import com.buddhatutors.feature.admin.home.navigation.AdminMainScreenRoute
 import com.buddhatutors.feature.admin.home.navigation.navigateToAdminMainPage
 import com.buddhatutors.feature.admin.home.navigation.registerAdminMainScreen
+import com.buddhatutors.feature.admin.master_home.navigation.MasterTutorHomeRoute
 import com.buddhatutors.feature.admin.master_home.navigation.navigateToMasterTutorHomePage
 import com.buddhatutors.feature.admin.master_home.navigation.registerMasterTutorHomeScreen
 import com.buddhatutors.feature.admin.tutor_detail_verification.navigation.navigateToAdminTutorVerificationScreen
@@ -43,10 +45,12 @@ import com.buddhatutors.feature.admin.tutor_detail_verification.navigation.regis
 import com.buddhatutors.feature.forgotpassword.navigation.navigateToForgotPasswordDialog
 import com.buddhatutors.feature.forgotpassword.navigation.registerForgotPasswordDialog
 import com.buddhatutors.feature.login.navigation.ExternalLoginNavigationHandler
+import com.buddhatutors.feature.login.navigation.LoginRoute
 import com.buddhatutors.feature.login.navigation.navigateToLoginScreen
 import com.buddhatutors.feature.login.navigation.registerLoginScreen
 import com.buddhatutors.feature.registration.navigation.navigateToUserRegistration
 import com.buddhatutors.feature.registration.navigation.registerUserRegistrationScreen
+import com.buddhatutors.feature.student.home.navigation.StudentMainPageRoute
 import com.buddhatutors.feature.student.home.navigation.navigateToStudentMainPage
 import com.buddhatutors.feature.student.home.navigation.registerStudentMainPage
 import com.buddhatutors.feature.student.slot_booking.navigation.navigateToStudentTutorDetailPage
@@ -55,10 +59,13 @@ import com.buddhatutors.feature.termconditions.navigation.navigateToTermConditio
 import com.buddhatutors.feature.termconditions.navigation.registerTermConditionScreen
 import com.buddhatutors.feature.tutor.edit_tutor.navigation.navigateToEditTutorAvailabilityPage
 import com.buddhatutors.feature.tutor.edit_tutor.navigation.registerEditTutorAvailabilityPage
+import com.buddhatutors.feature.tutor.home.navigation.TutorMainPageRoute
 import com.buddhatutors.feature.tutor.home.navigation.navigateToTutorMainPage
 import com.buddhatutors.feature.tutor.home.navigation.registerTutorMainPage
 import com.buddhatutors.feature.userprofile.navigation.navigateToUserProfileScreen
 import com.buddhatutors.feature.userprofile.navigation.registerUserProfileScreen
+import com.buddhatutors.model.user.UserType
+import com.buddhatutors.model.user.UserType.*
 import com.buddhatutors.ui.splash.navigation.SplashRoute
 import com.buddhatutors.ui.splash.navigation.registerSplash
 import dagger.hilt.android.AndroidEntryPoint
@@ -120,37 +127,27 @@ class MainActivity : ComponentActivity() {
                             registerSplash(
                                 openLoginPage = {
                                     navController.navigateToLoginScreen(navOptions {
-                                        navController.currentDestination?.route?.let { currRoute ->
-                                            popUpTo(currRoute) { inclusive = true }
-                                        }
+                                        popUpTo(SplashRoute) { inclusive = true }
                                     })
                                 },
                                 openStudentHomePage = {
                                     navController.navigateToStudentMainPage(navOptions {
-                                        navController.currentDestination?.route?.let { currRoute ->
-                                            popUpTo(currRoute) { inclusive = true }
-                                        }
+                                        popUpTo(SplashRoute) { inclusive = true }
                                     })
                                 },
                                 openTutorHomePage = {
                                     navController.navigateToTutorMainPage(navOptions {
-                                        navController.currentDestination?.route?.let { currRoute ->
-                                            popUpTo(currRoute) { inclusive = true }
-                                        }
+                                        popUpTo(SplashRoute) { inclusive = true }
                                     })
                                 },
                                 openAdminHomePage = {
                                     navController.navigateToAdminMainPage(navOptions {
-                                        navController.currentDestination?.route?.let { currRoute ->
-                                            popUpTo(currRoute) { inclusive = true }
-                                        }
+                                        popUpTo(SplashRoute) { inclusive = true }
                                     })
                                 },
                                 openMasterTutorHomePage = {
                                     navController.navigateToMasterTutorHomePage(navOptions {
-                                        navController.currentDestination?.route?.let { currRoute ->
-                                            popUpTo(currRoute) { inclusive = true }
-                                        }
+                                        popUpTo(SplashRoute) { inclusive = true }
                                     })
                                 }
                             )
@@ -173,8 +170,26 @@ class MainActivity : ComponentActivity() {
                                 openLoginPage = {
                                     navController.navigateToLoginScreen(
                                         navOptions = navOptions {
-                                            navController.currentDestination?.route?.let { currRoute ->
-                                                popUpTo(currRoute) { inclusive = true }
+                                            when (it) {
+                                                STUDENT -> {
+                                                    popUpTo(StudentMainPageRoute) {
+                                                        inclusive = true
+                                                    }
+                                                }
+
+                                                TUTOR -> {
+                                                    popUpTo(TutorMainPageRoute) { inclusive = true }
+                                                }
+
+                                                ADMIN -> {
+                                                    popUpTo(AdminMainScreenRoute) {
+                                                        inclusive = true
+                                                    }
+                                                }
+
+                                                MASTER_TUTOR -> {
+                                                    popUpTo(TutorMainPageRoute) { inclusive = true }
+                                                }
                                             }
                                         }
                                     )
@@ -370,19 +385,27 @@ private class DefaultLoginNavigationHandler(
     }
 
     override fun navigateToAdminHome() {
-        navNavHostController.navigateToAdminMainPage()
+        navNavHostController.navigateToAdminMainPage(navOptions {
+            popUpTo(LoginRoute) { inclusive = true }
+        })
     }
 
     override fun navigateToStudentHome() {
-        navNavHostController.navigateToStudentMainPage()
+        navNavHostController.navigateToStudentMainPage(navOptions {
+            popUpTo(LoginRoute) { inclusive = true }
+        })
     }
 
     override fun navigateToTutorHome() {
-        navNavHostController.navigateToTutorMainPage()
+        navNavHostController.navigateToTutorMainPage(navOptions {
+            popUpTo(LoginRoute) { inclusive = true }
+        })
     }
 
     override fun navigateToMasterTutor() {
-        navNavHostController.navigateToMasterTutorHomePage()
+        navNavHostController.navigateToMasterTutorHomePage(navOptions {
+            popUpTo(LoginRoute) { inclusive = true }
+        })
     }
 
     override fun openForgotPassword() {
