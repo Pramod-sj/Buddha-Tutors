@@ -13,7 +13,6 @@ class LogoutUser @Inject constructor(
     suspend operator fun invoke(): Resource<Boolean> {
         authService.logout()
         userSessionDataSource.clearSession()
-        //CredentialManager.create(context).clearCredentialState(ClearCredentialStateRequest())
         return Resource.Success(true)
     }
 

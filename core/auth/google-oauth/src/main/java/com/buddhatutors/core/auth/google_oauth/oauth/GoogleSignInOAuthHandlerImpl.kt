@@ -25,7 +25,7 @@ internal class GoogleSignInOAuthHandlerImpl @Inject constructor(
 
     companion object {
         const val SERVER_CLIENT_ID =
-            "63972000114-t4o2efn3taukfa71rt4ltk06no21tu0u.apps.googleusercontent.com"
+            "63972000114-53ldpb2ddg300nk80lj5hmo98r289oun.apps.googleusercontent.com"
     }
 
     override suspend fun authenticate(activity: Activity): Resource<String> {
@@ -91,7 +91,8 @@ internal class GoogleSignInOAuthHandlerImpl @Inject constructor(
             }
 
         } catch (e: Exception) {
-            Resource.Error(Throwable("Unexpected type of credential: " + e.message))
+            Log.e("AuthenticationError", "Unexpected type of credential: ${e.message}", e)
+            Resource.Error(Throwable("Unexpected type of credential: ${e.message}"))
         }
     }
 
