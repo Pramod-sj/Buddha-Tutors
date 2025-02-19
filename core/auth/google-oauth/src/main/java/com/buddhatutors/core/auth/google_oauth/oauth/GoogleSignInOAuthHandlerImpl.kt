@@ -12,7 +12,6 @@ import com.buddhatutors.core.auth.domain.UserSessionPreference
 import com.buddhatutors.domain.CurrentUser
 import com.buddhatutors.model.Resource
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -44,15 +43,11 @@ internal class GoogleSignInOAuthHandlerImpl @Inject constructor(
             return Resource.Success(existingIdToken)
         }
 
-        /*val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-        .setFilterByAuthorizedAccounts(filterByAuthorizedAccounts)
-        .setServerClientId(SERVER_CLIENT_ID)
-        .setAutoSelectEnabled(true)
-        .build()*/
-
-        val googleIdOption: GetSignInWithGoogleOption =
-            GetSignInWithGoogleOption.Builder(SERVER_CLIENT_ID)
-                .build()
+        val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
+            .setFilterByAuthorizedAccounts(filterByAuthorizedAccounts)
+            .setServerClientId(SERVER_CLIENT_ID)
+            .setAutoSelectEnabled(true)
+            .build()
 
         val request: GetCredentialRequest = GetCredentialRequest.Builder()
             .addCredentialOption(googleIdOption)
