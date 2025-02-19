@@ -18,28 +18,28 @@ import javax.inject.Inject
 
 internal class GoogleSignInOAuthHandlerImpl @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val userSessionDataSource: com.buddhatutors.core.auth.domain.UserSessionPreference
+    private val userSessionDataSource: UserSessionPreference
 ) : OAuthHandler {
 
     private val credentialManager = CredentialManager.create(context)
 
     companion object {
         const val SERVER_CLIENT_ID =
-            "63972000114-53ldpb2ddg300nk80lj5hmo98r289oun.apps.googleusercontent.com"
+            "63972000114-t4o2efn3taukfa71rt4ltk06no21tu0u.apps.googleusercontent.com"
     }
 
     override suspend fun authenticate(activity: Activity): Resource<String> {
 
-        val existingIdToken = userSessionDataSource.getUserToken(com.buddhatutors.core.auth.domain.UserSessionPreference.KEY_ID_TOKEN)
+        val existingIdToken = userSessionDataSource.getUserToken(UserSessionPreference.KEY_ID_TOKEN)
 
         if (existingIdToken != null) {
             return Resource.Success(existingIdToken)
         }
 
         val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-            .setAutoSelectEnabled(false)
             .setFilterByAuthorizedAccounts(false)
             .setServerClientId(SERVER_CLIENT_ID)
+            .setAutoSelectEnabled(true)
             .build()
 
         val request: GetCredentialRequest = GetCredentialRequest.Builder()
@@ -67,7 +67,7 @@ internal class GoogleSignInOAuthHandlerImpl @Inject constructor(
                                 Resource.Success(googleIdTokenCredential.idToken).also {
                                     userSessionDataSource.saveUserTokens(
                                         map = mapOf(
-                                            com.buddhatutors.core.auth.domain.UserSessionPreference.KEY_ID_TOKEN to it.data
+                                            UserSessionPreference.KEY_ID_TOKEN to it.data
                                         )
                                     )
                                 }

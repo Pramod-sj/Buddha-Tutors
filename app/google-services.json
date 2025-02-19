@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "63972000114",
     "project_id": "buddhatutor-e02ed",
-    "storage_bucket": "buddhatutor-e02ed.appspot.com"
+    "storage_bucket": "buddhatutor-e02ed.firebasestorage.app"
   },
   "client": [
     {
@@ -12,7 +12,20 @@
           "package_name": "com.buddhatutors"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "63972000114-4usdaic7v6lgucgh4taotcm9h25080o6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.buddhatutors",
+            "certificate_hash": "3c17387c500426d5074245facfb4f83646b213db"
+          }
+        },
+        {
+          "client_id": "63972000114-t4o2efn3taukfa71rt4ltk06no21tu0u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyA5zsFWNvaujQmlOhJuH8kpn2llJ-IvNjI"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "63972000114-53ldpb2ddg300nk80lj5hmo98r289oun.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
