@@ -7,6 +7,7 @@ import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.NoCredentialException
 import com.buddhatutors.core.auth.domain.UserSessionPreference
 import com.buddhatutors.domain.CurrentUser
 import com.buddhatutors.model.Resource
@@ -29,7 +30,13 @@ internal class GoogleSignInOAuthHandlerImpl @Inject constructor(
     }
 
     override suspend fun authenticate(activity: Activity): Resource<String> {
+        return authenticate(activity, true)
+    }
 
+    private suspend fun authenticate(
+        activity: Activity,
+        filterByAuthorizedAccounts: Boolean = true
+    ): Resource<String> {
         val existingIdToken = userSessionDataSource.getUserToken(UserSessionPreference.KEY_ID_TOKEN)
 
         if (existingIdToken != null) {
@@ -37,7 +44,7 @@ internal class GoogleSignInOAuthHandlerImpl @Inject constructor(
         }
 
         val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(false)
+            .setFilterByAuthorizedAccounts(filterByAuthorizedAccounts)
             .setServerClientId(SERVER_CLIENT_ID)
             .setAutoSelectEnabled(true)
             .build()
@@ -90,6 +97,18 @@ internal class GoogleSignInOAuthHandlerImpl @Inject constructor(
                 }
             }
 
+        } catch (e: NoCredentialException) {
+            // If no authorized accounts are available, retry with filterByAuthorizedAccounts = false
+            if (filterByAuthorizedAccounts) {
+                Log.i(
+                    "AuthenticationInfo",
+                    "No authorized accounts found. Retrying with all accounts."
+                )
+                authenticate(activity, filterByAuthorizedAccounts = false)
+            } else {
+                Log.e("AuthenticationError", "No credentials available: ${e.message}", e)
+                Resource.Error(Throwable("No credentials available"))
+            }
         } catch (e: Exception) {
             Log.e("AuthenticationError", "Unexpected type of credential: ${e.message}", e)
             Resource.Error(Throwable("Unexpected type of credential: ${e.message}"))
