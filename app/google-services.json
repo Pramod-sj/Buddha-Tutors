@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "63972000114-hl9voa7l8ji85irl8795pav6k7boepvj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.buddhatutors",
+            "certificate_hash": "0f69ace22ddc1ad9aab11f39c1aeaddb5839bf6b"
+          }
+        },
+        {
           "client_id": "63972000114-t4o2efn3taukfa71rt4ltk06no21tu0u.apps.googleusercontent.com",
           "client_type": 3
         }
