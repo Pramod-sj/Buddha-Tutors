@@ -16,9 +16,9 @@ android {
     defaultConfig {
         applicationId = "com.buddhatutors"
         minSdk = 24
-        targetSdk = 34
-        versionCode = 12
-        versionName = "0.0.12"
+        targetSdk = 35
+        versionCode = 13
+        versionName = "0.0.13"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
