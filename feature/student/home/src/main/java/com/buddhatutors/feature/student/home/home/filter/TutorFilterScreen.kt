@@ -47,9 +47,9 @@ internal fun PreviewTutorFilterScreen() {
 
 @Composable
 fun TutorFilterScreen(
-    filterOption: com.buddhatutors.model.FilterOption?,
+    filterOption: FilterOption?,
     onCloseClick: () -> Unit,
-    onFilterApplied: (filterOption: com.buddhatutors.model.FilterOption?) -> Unit,
+    onFilterApplied: (filterOption: FilterOption?) -> Unit,
 ) {
 
     val onFilterAppliedUpdatedState by rememberUpdatedState(onFilterApplied)

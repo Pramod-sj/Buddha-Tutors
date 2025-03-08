@@ -31,17 +31,23 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ModalBottomSheetDefaults
+import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -108,15 +114,16 @@ fun StudentHomeScreen(
         }
     }
 
+    val filterSheetState = rememberModalBottomSheetState(true)
+
     if (uiState.showFilterScreen) {
 
-        Dialog(
+        ModalBottomSheet(
             onDismissRequest = {
                 viewModel.setEvent(StudentHomeUiEvent.HideFilterScreen)
             },
-            properties = DialogProperties(
-                usePlatformDefaultWidth = false
-            )
+            dragHandle = null,
+            sheetState = filterSheetState,
         ) {
             TutorFilterScreen(
                 filterOption = uiState.filterOption,
@@ -127,7 +134,6 @@ fun StudentHomeScreen(
                     viewModel.setEvent(StudentHomeUiEvent.ApplyFilterOption(it))
                 })
         }
-
     }
 }
 
@@ -136,7 +142,7 @@ internal fun StudentHomeScreenContent(
     uiState: StudentHomeUiState,
     uiEvent: (StudentHomeUiEvent) -> Unit,
 ) {
-    val tutorListingLazyPagingItems: LazyPagingItems<com.buddhatutors.model.tutorlisting.TutorListing> =
+    val tutorListingLazyPagingItems: LazyPagingItems<TutorListing> =
         uiState.tutorListing.collectAsLazyPagingItems()
 
     val pullRefreshState = rememberPullToRefreshState()
@@ -312,7 +318,7 @@ internal fun StudentHomeScreenContent(
 @Composable
 fun TutorItemCard(
     modifier: Modifier = Modifier,
-    tutorListing: com.buddhatutors.model.tutorlisting.TutorListing,
+    tutorListing: TutorListing,
     onClick: () -> Unit = {},
 ) {
 
